@@ -1,0 +1,160 @@
+{
+  "generated_at": "2026-10-16T20:39:19+00:00",
+  "data_end": "2026-08",
+  "source": "WFP VAM food prices (HDX): https://data.humdata.org/dataset/wfp-food-prices-for-uganda",
+  "price_basis": "market",
+  "crops": {
+    "beans": {
+      "crop_name": "Beans",
+      "unit": "UGX/kg",
+      "price_basis": "market",
+      "market_price": 3564.0,
+      "market_price_forecast": 3543.0,
+      "forecast_month": "2026-09",
+      "market_factor": 0.842,
+      "market_factor_basis": "measured",
+      "observed_retail_price": 4233.0,
+      "markets_used": 9,
+      "core_markets": {
+        "Gulu": {
+          "market_price": 4173.0,
+          "market_price_forecast": 4128.0,
+          "month": "2026-04"
+        },
+        "Palabek (refugee settlement)": {
+          "market_price": 3253.0,
+          "market_price_forecast": 3221.0,
+          "month": "2026-08"
+        }
+      },
+      "forecast_method": "model",
+      "stale": false,
+      "latest_data_month": "2026-08"
+    },
+    "cassava_fresh": {
+      "crop_name": "Cassava (fresh)",
+      "unit": "UGX/kg",
+      "price_basis": "market",
+      "market_price": 514.0,
+      "market_price_forecast": 532.0,
+      "forecast_month": "2026-09",
+      "market_factor": 0.875,
+      "market_factor_basis": "assumed",
+      "observed_retail_price": 588.0,
+      "markets_used": 7,
+      "core_markets": {
+        "Palabek (refugee settlement)": {
+          "market_price": 514.0,
+          "market_price_forecast": 575.0,
+          "month": "2026-08"
+        }
+      },
+      "forecast_method": "model",
+      "stale": false,
+      "latest_data_month": "2026-08"
+    },
+    "leafy_vegetables": {
+      "crop_name": "Leafy vegetables",
+      "unit": "UGX/kg",
+      "price_basis": "market",
+      "market_price": 1750.0,
+      "market_price_forecast": 1810.0,
+      "forecast_month": "2026-09",
+      "market_factor": 0.875,
+      "market_factor_basis": "assumed",
+      "observed_retail_price": 2000.0,
+      "markets_used": 7,
+      "core_markets": {
+        "Palabek (refugee settlement)": {
+          "market_price": 1750.0,
+          "market_price_forecast": 1848.0,
+          "month": "2026-08"
+        }
+      },
+      "forecast_method": "model",
+      "stale": false,
+      "latest_data_month": "2026-08"
+    },
+    "maize": {
+      "crop_name": "Maize",
+      "unit": "UGX/kg",
+      "price_basis": "market",
+      "market_price": 1721.0,
+      "market_price_forecast": 1723.0,
+      "forecast_month": "2026-09",
+      "market_factor": 0.883,
+      "market_factor_basis": "measured",
+      "observed_retail_price": 1949.0,
+      "markets_used": 9,
+      "core_markets": {
+        "Gulu": {
+          "market_price": 1721.0,
+          "market_price_forecast": 1808.0,
+          "month": "2026-04"
+        },
+        "Palabek (refugee settlement)": {
+          "market_price": 1285.0,
+          "market_price_forecast": 1289.0,
+          "month": "2026-08"
+        }
+      },
+      "forecast_method": "model",
+      "stale": false,
+      "latest_data_month": "2026-08"
+    },
+    "millet": {
+      "crop_name": "Millet",
+      "unit": "UGX/kg",
+      "price_basis": "market",
+      "market_price": 2438.0,
+      "market_price_forecast": 2563.0,
+      "forecast_month": "2026-02",
+      "market_factor": 0.875,
+      "market_factor_basis": "assumed",
+      "observed_retail_price": 2786.0,
+      "markets_used": 11,
+      "core_markets": {
+        "Gulu": {
+          "market_price": 2438.0,
+          "market_price_forecast": 2564.0,
+          "month": "2025-12"
+        },
+        "Lira": {
+          "market_price": 2188.0,
+          "market_price_forecast": 2149.0,
+          "month": "2025-12"
+        }
+      },
+      "forecast_method": "model",
+      "stale": true,
+      "latest_data_month": "2026-01"
+    },
+    "sorghum": {
+      "crop_name": "Sorghum",
+      "unit": "UGX/kg",
+      "price_basis": "market",
+      "market_price": 1745.0,
+      "market_price_forecast": 1836.0,
+      "forecast_month": "2026-09",
+      "market_factor": 0.875,
+      "market_factor_basis": "assumed",
+      "observed_retail_price": 1994.0,
+      "markets_used": 9,
+      "core_markets": {
+        "Gulu": {
+          "market_price": 1861.0,
+          "market_price_forecast": 1855.0,
+          "month": "2026-04"
+        },
+        "Palabek (refugee settlement)": {
+          "market_price": 1217.0,
+          "market_price_forecast": 1212.0,
+          "month": "2026-08"
+        }
+      },
+      "forecast_method": "model",
+      "stale": false,
+      "latest_data_month": "2026-08"
+    }
+  }
+}

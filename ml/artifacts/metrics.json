@@ -1,0 +1,102 @@
+{
+  "overall": {
+    "rows": 626,
+    "model": {
+      "mape_pct": 16.71,
+      "within_10pct": 47.1
+    },
+    "naive": {
+      "mape_pct": 18.53,
+      "within_10pct": 48.7
+    },
+    "model_beats_naive": true
+  },
+  "by_crop": {
+    "beans": {
+      "rows": 144,
+      "model": {
+        "mape_pct": 8.73,
+        "within_10pct": 66.7
+      },
+      "naive": {
+        "mape_pct": 9.05,
+        "within_10pct": 68.8
+      },
+      "model_beats_naive": true
+    },
+    "cassava_fresh": {
+      "rows": 82,
+      "model": {
+        "mape_pct": 28.12,
+        "within_10pct": 22.0
+      },
+      "naive": {
+        "mape_pct": 32.36,
+        "within_10pct": 29.3
+      },
+      "model_beats_naive": true
+    },
+    "leafy_vegetables": {
+      "rows": 82,
+      "model": {
+        "mape_pct": 30.77,
+        "within_10pct": 24.4
+      },
+      "naive": {
+        "mape_pct": 36.07,
+        "within_10pct": 25.6
+      },
+      "model_beats_naive": true
+    },
+    "maize": {
+      "rows": 144,
+      "model": {
+        "mape_pct": 14.24,
+        "within_10pct": 50.0
+      },
+      "naive": {
+        "mape_pct": 15.31,
+        "within_10pct": 48.6
+      },
+      "model_beats_naive": true
+    },
+    "millet": {
+      "rows": 32,
+      "model": {
+        "mape_pct": 9.68,
+        "within_10pct": 59.4
+      },
+      "naive": {
+        "mape_pct": 10.09,
+        "within_10pct": 68.8
+      },
+      "model_beats_naive": true
+    },
+    "sorghum": {
+      "rows": 142,
+      "model": {
+        "mape_pct": 14.19,
+        "within_10pct": 49.3
+      },
+      "naive": {
+        "mape_pct": 15.18,
+        "within_10pct": 48.6
+      },
+      "model_beats_naive": true
+    }
+  },
+  "trained_at": "2026-10-16T20:39:19+00:00",
+  "data_end": "2026-08",
+  "test_from": "2025-08",
+  "train_rows": 4959,
+  "all_rows": 5585,
+  "model_used_for": [
+    "beans",
+    "cassava_fresh",
+    "leafy_vegetables",
+    "maize",
+    "millet",
+    "sorghum"
+  ],
+  "baseline": "naive: next month's price = this month's price"
+}
