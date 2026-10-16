@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.db
+
+# Node
+node_modules/
+frontend/dist/
+
+# Secrets
+.env
+local.settings.json
+
+# Data (raw downloads stay local; processed + artifacts are committed for the demo)
+ml/data/raw/*
+!ml/data/raw/.gitkeep
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
