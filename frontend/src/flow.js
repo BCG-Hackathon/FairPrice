@@ -1,4 +1,5 @@
 const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const DEFAULTS={name:'Community kiosk',market:'',language:'en',idleMinutes:2};
 let setup={...DEFAULTS};
@@ -335,32 +336,52 @@ function renderStaff(){
   }
   const tools=document.createElement('section');tools.innerHTML='<h2>Buyer review & source automation</h2><p>Registrations stay private until reviewed. Review is not proof of identity or ability to pay. Listings expire after 30 days.</p><label for="staff-key">Staff access key</label><input id="staff-key" type="password" autocomplete="off"><p class="form-note">Never saved on this device. Closing this staff session clears it. Configure ADMIN_TOKEN on the server; the default token is rejected.</p><div class="detail-actions"><button id="review-buyers">Review buyer registrations</button><button id="source-check">Check official source now</button><button id="source-status">Automation status</button></div><div id="staff-results" role="status"></div>';$('#app').append(tools);
   $('#review-buyers').onclick=reviewBuyers;$('#source-check').onclick=()=>sourceStatus(true);$('#source-status').onclick=()=>sourceStatus(false);
-  const updates=document.createElement('section');updates.innerHTML=`<h2>Farmer SMS updates</h2><p>Texts farmers the latest vegetable, fruit and grain/crop prices per kg (UGX, grades A, B and C) from the published records. Uses the staff access key above. You see the exact message before anything is sent.</p><div class="setup-form"><label for="sms-phones">Farmer phone numbers</label><input id="sms-phones" autocomplete="off" placeholder="+256700000000, +256711111111"><p class="form-note">Include the country code. Separate numbers with commas.</p><label for="sms-group">Or a BulkSMS phonebook group</label><input id="sms-group" maxlength="100" autocomplete="off"><label for="sms-language">Message language</label><select id="sms-language"><option value="en" ${state.lang==='en'?'selected':''}>English</option><option value="sw" ${state.lang==='sw'?'selected':''}>Kiswahili</option></select></div><div class="detail-actions"><button id="send-updates" class="primary">Send Updates</button></div><div id="sms-results" role="status"></div>`;$('#app').append(updates);
+  const updates=document.createElement('section');updates.className='sms-updates';updates.innerHTML=`<h2>Farmer SMS updates</h2><p>Texts the latest vegetable, fruit and grain/crop prices per kg (UGX, grades A, B and C). You see the exact message before anything is sent.</p><fieldset class="sms-recipients"><legend>Recipients</legend><label class="sms-all"><input type="checkbox" id="sms-all"> <strong>Everyone (bulk)</strong> <span id="sms-count"></span></label><ul id="sms-contacts"><li class="form-note">Loading recipients…</li></ul><form id="sms-add" class="sms-add"><input id="sms-name" maxlength="60" placeholder="Name" aria-label="Recipient name" required><input id="sms-phone" type="tel" maxlength="24" placeholder="Phone number" aria-label="Recipient phone number" required><label><input type="checkbox" id="sms-add-consent" required> Agreed to receive SMS</label><button type="submit">Add</button></form><p id="sms-add-status" class="form-note" role="status"></p></fieldset><div class="sms-send"><label for="sms-language">Language</label><select id="sms-language"><option value="en" ${state.lang==='en'?'selected':''}>English</option><option value="sw" ${state.lang==='sw'?'selected':''}>Kiswahili</option></select><button id="send-updates" class="primary" disabled>Send Updates</button></div><div id="sms-results" role="status"></div>`;$('#app').append(updates);
   $('#send-updates').onclick=()=>farmerUpdates(false);
+  $('#sms-all').onchange=e=>{$$('[data-contact-phone]').forEach(box=>{box.checked=e.target.checked;});smsSelection();};
+  $('#sms-contacts').onchange=smsSelection;
+  $('#sms-contacts').onclick=async e=>{const id=e.target.closest('[data-remove-contact]')?.dataset.removeContact;if(!id)return;e.target.disabled=true;try{await staffRequest(`/api/sms/contacts/${id}`,null,'DELETE');loadContacts();}catch(error){$('#sms-add-status').textContent=error.message;e.target.disabled=false;}};
+  $('#sms-add').onsubmit=async e=>{e.preventDefault();const status=$('#sms-add-status');
+    try{const c=await staffRequest('/api/sms/contacts',{name:$('#sms-name').value,phone:$('#sms-phone').value,consent:$('#sms-add-consent').checked});e.target.reset();status.textContent=`Added ${c.name} (${c.phone}).`;loadContacts(c.phone);}catch(error){status.textContent=error.message;}};
+  $('#staff-key').onchange=()=>loadContacts();
   // On the kiosk machine itself the server provides the staff key; elsewhere staff type it.
-  fetch('/api/sms/staff-key',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{const input=$('#staff-key');if(d?.key&&input&&!input.value)input.value=d.key;}).catch(()=>{});
+  fetch('/api/sms/staff-key',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{const input=$('#staff-key');if(d?.key&&input&&!input.value)input.value=d.key;}).catch(()=>{}).finally(()=>loadContacts());
+}
+let smsContacts=[];
+async function loadContacts(added){
+  const list=$('#sms-contacts');if(!list)return;
+  const kept=new Set($$('[data-contact-phone]').filter(box=>box.checked).map(box=>box.dataset.contactPhone)),first=!$$('[data-contact-phone]').length;
+  try{const data=await staffRequest('/api/sms/contacts');if(!list.isConnected)return;smsContacts=data.contacts;
+    $('#sms-phone').placeholder=`Phone, e.g. 0700 000 000 (0… = ${data.country_code})`;
+    list.innerHTML=smsContacts.length?smsContacts.map(c=>`<li><label><input type="checkbox" data-contact-phone="${esc(c.phone)}" ${first||kept.has(c.phone)||c.phone===added?'checked':''}> <span>${esc(c.name)}</span> <small>${esc(c.phone)}</small></label><button type="button" data-remove-contact="${c.id}" aria-label="Remove ${esc(c.name)}">Remove</button></li>`).join(''):'<li class="form-note">No recipients yet. Add one below.</li>';
+  }catch(error){if(list.isConnected)list.innerHTML=`<li class="form-note">${esc(error.message)}</li>`;}
+  smsSelection();
+}
+function smsSelection(){
+  const boxes=$$('[data-contact-phone]'),chosen=boxes.filter(box=>box.checked).length,button=$('#send-updates');if(!button)return;
+  $('#sms-all').checked=boxes.length>0&&chosen===boxes.length;$('#sms-all').indeterminate=chosen>0&&chosen<boxes.length;
+  $('#sms-count').textContent=boxes.length?`· ${chosen} of ${boxes.length} selected`:'';
+  button.disabled=!chosen;button.textContent=chosen?`Send Updates to ${chosen} recipient${chosen>1?'s':''}`:'Send Updates';
 }
 function smsParts(characters){return characters<=160?1:Math.ceil(characters/153);}
-// Staff-only: preview the farmer price SMS, then send it after consent is confirmed.
+// Staff-only: preview the farmer price SMS for the ticked recipients, then send on confirmation.
 async function farmerUpdates(send){
   const target=$('#sms-results'),version=navigationVersion,button=$('#send-updates');
-  const phones=[...new Set($('#sms-phones').value.split(/[\s,;]+/).filter(Boolean))],group=$('#sms-group').value.trim()||null;
-  if(!phones.length&&!group){target.textContent='Enter farmer phone numbers or a BulkSMS group.';return;}
-  const invalid=phones.filter(p=>!/^\+[1-9][0-9]{7,14}$/.test(p));
-  if(invalid.length){target.textContent=`Check these numbers (use the country code, e.g. +256…): ${invalid.join(', ')}`;return;}
-  const recipients=[phones.length?`${phones.length} number${phones.length>1?'s':''}`:'',group?`group "${group}"`:''].filter(Boolean).join(' and ');
+  const phones=$$('[data-contact-phone]').filter(box=>box.checked).map(box=>box.dataset.contactPhone);
+  if(!phones.length){target.textContent='Tick at least one recipient.';return;}
+  const names=Object.fromEntries(smsContacts.map(c=>[c.phone,c.name]));
   button.disabled=true;target.textContent=send?'Sending updates…':'Preparing the message…';
-  try{const data=await staffRequest('/api/sms/farmers',{phones,group,language:$('#sms-language').value,dry_run:!send,consent_confirmed:send});if(version!==navigationVersion)return;
+  try{const data=await staffRequest('/api/sms/farmers',{phones,language:$('#sms-language').value,dry_run:!send,consent_confirmed:send});if(version!==navigationVersion)return;
     if(!send){
-      target.innerHTML=`<h3>Check the message</h3><div class="phone"><small>SMS · FAIRPRICE</small><p class="sms-message">${esc(data.text)}</p></div><p>${data.characters} characters · ${smsParts(data.characters)} SMS parts per farmer · to ${esc(recipients)}</p><label><input type="checkbox" id="sms-consent"> These farmers agreed to receive FairPrice SMS</label><div class="detail-actions"><button id="sms-confirm" class="primary" disabled>Confirm and send</button><button id="sms-cancel">Cancel</button></div>`;
-      $('#sms-consent').onchange=e=>{$('#sms-confirm').disabled=!e.target.checked;};
+      target.innerHTML=`<h3>Check the message</h3><div class="phone"><small>SMS · FAIRPRICE</small><p class="sms-message">${esc(data.text)}</p></div><p>${data.characters} characters · ${smsParts(data.characters)} SMS parts each · to ${esc(phones.map(p=>names[p]||p).join(', '))}</p><div class="detail-actions"><button id="sms-confirm" class="primary">Confirm and send to ${phones.length}</button><button id="sms-cancel">Cancel</button></div>`;
       $('#sms-confirm').onclick=()=>farmerUpdates(true);$('#sms-cancel').onclick=()=>{target.textContent='Not sent.';};
+      $('#sms-confirm').focus();
     }else{
       const sent=data.deliveries.filter(d=>d.status==='sent').length;
-      target.innerHTML=`<h3>${sent?`Sent to ${sent} recipient${sent>1?'s':''}`:'Nothing was sent'}</h3><ul>${data.deliveries.map(d=>`<li>${esc(d.to)}: <strong>${esc(d.status)}</strong>${d.error?` · ${esc(d.error)}`:''}</li>`).join('')}</ul>`;
+      target.innerHTML=`<h3>${sent?`Sent to ${sent} of ${phones.length} recipient${phones.length>1?'s':''}`:'Nothing was sent'}</h3><ul>${data.deliveries.map(d=>`<li>${esc(names[d.to]||'')} ${esc(d.to)}: <strong>${esc(d.status)}</strong>${d.error?` · ${esc(d.error)}`:''}</li>`).join('')}</ul>`;
     }
   }catch(error){if(version===navigationVersion)target.textContent=error.message;}
-  finally{if(button.isConnected)button.disabled=false;}
+  finally{if(button.isConnected)smsSelection();}
 }
 async function trainingDialog(){
   const version=navigationVersion;
@@ -399,10 +420,11 @@ function registerBuyer(grade='B'){
     try{const response=await fetch('/api/buyers/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!response.ok){if(response.status===429)throw Error('limit');throw Error('invalid');}if(version!==navigationVersion||!target.isConnected)return;form.reset();showModal(`<h2>${text('Registration received','Usajili umepokelewa')}</h2><p>${text('Your request is waiting for kiosk review. It is not public yet. Ask kiosk staff to approve, update or withdraw it.','Ombi lako linasubiri ukaguzi wa kioski. Bado halijachapishwa. Muombe mhudumu aliidhinishe, alisasishe au aliondoe.')}</p>`);}catch(error){if(target.isConnected){target.textContent=error.message==='limit'?text('Registration limit reached. Ask kiosk staff.','Kikomo cha usajili kimefikiwa. Muulize mhudumu.'):text('Could not submit. Check your details and connection. Your request has not been confirmed.','Imeshindikana kuwasilisha. Angalia taarifa na muunganisho. Ombi halijathibitishwa.');button.disabled=false;}}
   };
 }
-async function staffRequest(path,body){
+async function staffRequest(path,body,method){
   const key=$('#staff-key')?.value||'';if(!key)throw Error('Enter the staff access key. It is never saved.');
-  const response=await fetch(path,{method:body?'POST':'GET',cache:'no-store',headers:{'X-Admin-Token':key,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
-  if(!response.ok)throw Error(response.status===401?'Staff access denied. Check the server access key.':'Request failed. Reconnect and try again.');return response.json();
+  const response=await fetch(path,{method:method||(body?'POST':'GET'),cache:'no-store',headers:{'X-Admin-Token':key,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
+  if(!response.ok){const detail=response.status===422?(await response.json().catch(()=>({}))).detail:null;throw Error(response.status===401?'Staff access denied. Check the server access key.':typeof detail==='string'?detail:'Request failed. Reconnect and try again.');}
+  return response.status===204?null:response.json();
 }
 async function reviewBuyers(){
   const target=$('#staff-results'),version=navigationVersion;target.textContent='Loading registrations…';

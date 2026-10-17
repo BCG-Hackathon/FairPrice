@@ -296,3 +296,12 @@ class SourceRefreshRun(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     status: Mapped[str] = mapped_column(String(32))
     details: Mapped[dict] = mapped_column(JSON)
+
+
+class SmsContact(Base):
+    """Saved SMS update recipient. Added by kiosk staff after the person agreed to receive texts."""
+    __tablename__ = "sms_contacts"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(Unicode(60))
+    phone: Mapped[str] = mapped_column(String(20), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

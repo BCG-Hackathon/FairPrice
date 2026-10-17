@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     bulksms_max_parts: int = 4  # each SMS part costs credits; farmer list fits 4, buyer texts 2
     # Comma-separated E.164 numbers. When set, SMS only goes to these numbers (testing).
     comms_allowed_recipients: str = ""
+    # Country code for local numbers typed by staff (e.g. 0772... -> +256772...).
+    sms_default_country_code: str = Field(default="+256", pattern=r"^\+[1-9][0-9]{0,3}$")
 
     # Defaults for channels
     default_language: str = "en"

@@ -4,6 +4,7 @@ Both are kiosk-staff actions (they can message many people), default to a dry ru
 returns the exact text, and log every real send in sms_outbox.
 """
 
+import re
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Header, HTTPException, Request, Response
@@ -12,7 +13,7 @@ from sqlalchemy import select
 
 from app.api.buyers import secure_admin
 from app.deps import AppSettings, DbSession
-from app.models import BuyerListing, OutboxStatus, SmsOutbox, utcnow
+from app.models import BuyerListing, OutboxStatus, SmsContact, SmsOutbox, utcnow
 from app.services import bulksms
 from app.services.sms_updates import buyer_update, farmer_update
 
@@ -69,6 +70,65 @@ def _mode(settings, dry_run: bool) -> str:
     if not bulksms.configured(settings):
         raise HTTPException(409, "BulkSMS is not configured (BULKSMS_TOKEN_ID / BULKSMS_TOKEN_SECRET)")
     return "send"
+
+
+class ContactIn(BaseModel):
+    name: str = Field(min_length=1, max_length=60)
+    phone: str = Field(min_length=1, max_length=24, description="International (+256...) or local (0...) number")
+    consent: bool = Field(description="The person agreed to receive FairPrice SMS")
+
+
+def normalize_phone(raw: str, country_code: str) -> str:
+    """'060 602 3950' -> '+27606023950' (with country code +27); international numbers pass through."""
+    number = "".join(ch for ch in raw.strip() if ch.isdigit() or ch == "+")
+    if number.startswith("00"):
+        number = "+" + number[2:]
+    elif number.startswith("0"):
+        number = country_code + number[1:]
+    elif not number.startswith("+"):
+        number = "+" + number
+    if not re.fullmatch(E164, number):
+        raise HTTPException(422, f"'{raw}' is not a valid phone number")
+    return number
+
+
+def _contact(c: SmsContact) -> dict:
+    return {"id": c.id, "name": c.name, "phone": c.phone}
+
+
+@router.get("/contacts", summary="Saved SMS update recipients")
+def list_contacts(db: DbSession, settings: AppSettings, x_admin_token: Annotated[str | None, Header()] = None):
+    secure_admin(settings, x_admin_token)
+    return {"contacts": [_contact(c) for c in db.scalars(select(SmsContact).order_by(SmsContact.name))],
+            "country_code": settings.sms_default_country_code}
+
+
+@router.post("/contacts", status_code=201, summary="Save an SMS update recipient (requires their consent)")
+def add_contact(body: ContactIn, db: DbSession, settings: AppSettings,
+                x_admin_token: Annotated[str | None, Header()] = None):
+    secure_admin(settings, x_admin_token)
+    if not body.consent:
+        raise HTTPException(422, "Only save people who agreed to receive FairPrice SMS")
+    phone = normalize_phone(body.phone, settings.sms_default_country_code)
+    contact = db.scalar(select(SmsContact).where(SmsContact.phone == phone))
+    if contact:
+        contact.name = body.name.strip()
+    else:
+        contact = SmsContact(name=body.name.strip(), phone=phone)
+        db.add(contact)
+    db.commit()
+    return _contact(contact)
+
+
+@router.delete("/contacts/{contact_id}", status_code=204, summary="Remove a saved SMS update recipient")
+def delete_contact(contact_id: int, db: DbSession, settings: AppSettings,
+                   x_admin_token: Annotated[str | None, Header()] = None):
+    secure_admin(settings, x_admin_token)
+    contact = db.get(SmsContact, contact_id)
+    if contact:
+        db.delete(contact)
+        db.commit()
+    return Response(status_code=204)
 
 
 @router.get("/staff-key", include_in_schema=False)
