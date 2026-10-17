@@ -280,7 +280,7 @@ setInterval(()=>{
 function render(){
   document.documentElement.lang=state.lang;
   $('#language').textContent=text('English / Kiswahili','Kiswahili / English');
-  $('#start-over').textContent=text('Start again','Anza tena');
+  $('#start-over').textContent=text('Home','Nyumbani');
   $('#staff-open').textContent=text('Kiosk staff','Wahudumu wa kioski');
   $('#footer-copy').textContent=text('Farmers: no account needed · Dated reference prices','Wakulima: hamhitaji akaunti · Bei za kumbukumbu');
   $('#app').dataset.screen=state.screen;
