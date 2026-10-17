@@ -1,6 +1,0 @@
-{
-  "name": "fairprice-kiosk-checks",
-  "private": true,
-  "scripts": {"test:ui": "node frontend/tests/flow.cjs"},
-  "devDependencies": {"jsdom": "^26.1.0"}
-}

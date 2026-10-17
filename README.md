@@ -19,7 +19,7 @@ python -m venv .venv
 
 Open http://127.0.0.1:8000. API documentation: http://127.0.0.1:8000/docs.
 
-For model verification, also install `ml/requirements.txt`, then run `python ml/verify_saved.py` with the same environment. Backend checks: install `backend/requirements-dev.txt`, then run `python -m pytest -c backend/pyproject.toml backend/tests`. UI DOM checks: `npm ci` followed by `npm run test:ui` against the running server.
+For model verification, also install `ml/requirements.txt`, then run `python ml/verify_saved.py` with the same environment.
 
 Supported crops: **beans, maize grain, sorghum, millet, fresh cassava and leafy vegetables**. All prices show the market and observation month. A/B/C price multipliers are **1.04 / 1.00 / 0.945**, configured application estimates, not official UNBS premiums. The staff-only SMS simulator sends nothing; the farmer SMS action explains that real delivery is unavailable.
 
@@ -34,6 +34,18 @@ There is no buyer/seller marketplace, live SMS gateway, live price collection, A
 Market price transparency for smallholder farmers in Northern Uganda: fair, verifiable prices for Category A and B produce, by kiosk tablet and by SMS/USSD on feature phones.
 
 See [PLAN.md](PLAN.md) for the architecture and build plan.
+
+## SMS price updates (BulkSMS)
+
+Two kiosk-staff endpoints send prices from the local database (the same records the kiosk shows). Both need the staff key (`X-Admin-Token`), default to a dry run that returns the exact text, and log real sends in `sms_outbox`.
+
+- `POST /api/sms/farmers`: vegetables and fruits. Each crop shows its average grade-B price across markets with recent records, the model's estimate and its trend. Fruits say "no published prices yet" until there is data.
+  `{"phones": ["+27658737476"], "categories": ["vegetables", "fruits"], "language": "en", "dry_run": false, "consent_confirmed": true}`
+  (or `"group": "<BulkSMS phonebook group>"` to reach every contact in that group)
+- `POST /api/sms/buyers`: every active, staff-reviewed buyer with a published phone gets where their crop and grade traded recently, at their grade's price, plus the model trend.
+  `{"crop": "beans", "dry_run": false}` (`crop` is optional)
+
+Set `BULKSMS_TOKEN_ID` and `BULKSMS_TOKEN_SECRET` in `.env` (see `.env.example`). Messages fit 2 SMS parts. `COMMS_ALLOWED_RECIPIENTS` limits real sends while testing.
 
 ## Layout
 

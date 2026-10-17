@@ -22,7 +22,7 @@ from app.services.sms_gateway import OutboxGateway
 from app.services.transport import EstimatedTransport
 from app.services.published_seed import seed_published
 from app.api import kiosk
-from app.api import buyers, source_refresh
+from app.api import buyers, source_refresh, sms_updates
 
 logger = logging.getLogger("fairprice")
 
@@ -101,6 +101,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     if settings.data_mode == "published":
         app.include_router(buyers.router)
         app.include_router(source_refresh.router)
+        app.include_router(sms_updates.router)
     kiosk.mount_assets(app)
 
     @app.get("/health", tags=["status"], summary="Liveness probe")
