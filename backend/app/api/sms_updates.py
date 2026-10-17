@@ -6,7 +6,7 @@ returns the exact text, and log every real send in sms_outbox.
 
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Header, HTTPException, Response
+from fastapi import APIRouter, Header, HTTPException, Request, Response
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import select
 
@@ -69,6 +69,15 @@ def _mode(settings, dry_run: bool) -> str:
     if not bulksms.configured(settings):
         raise HTTPException(409, "BulkSMS is not configured (BULKSMS_TOKEN_ID / BULKSMS_TOKEN_SECRET)")
     return "send"
+
+
+@router.get("/staff-key", include_in_schema=False)
+def staff_key(request: Request, settings: AppSettings, response: Response):
+    """Fill in the staff key on the kiosk machine itself (local environment, loopback requests only)."""
+    if settings.environment != "local" or not request.client or request.client.host not in {"127.0.0.1", "::1"}:
+        raise HTTPException(404)
+    response.headers["Cache-Control"] = "no-store"
+    return {"key": settings.admin_token}
 
 
 @router.post("/farmers", summary="SMS farmers a simple price list: vegetables, fruits, grains/crops")
