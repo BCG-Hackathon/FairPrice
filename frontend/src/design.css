@@ -43,4 +43,3 @@ main{max-width:none;padding:0 2.75vw 45px;min-height:70vh}h1{color:var(--green);
 .grade-details .grade .grade-points{order:2;flex:1;margin:16px 0 22px;padding-left:1.2em;color:white;font-size:clamp(16px,1.35vw,24px);line-height:1.5;font-weight:600}
 .grade-points li+li{margin-top:10px}
 @media(max-width:680px){.grade-details .grade .grade-points{font-size:18px;margin:16px 0 24px}.grade-points li+li{margin-top:12px}}
-.welcome-hero{text-align:center;padding:48px 16px 0}.welcome-hero h1{color:var(--green);font-size:clamp(34px,5vw,60px);margin:0 0 12px;letter-spacing:.5px}.welcome-tagline{font-size:clamp(18px,2.2vw,26px);line-height:1.5;margin:0 auto 20px;max-width:34ch;color:#203b2a}.welcome-tagline span{color:#5b6b60}.welcome-prompt{display:inline-block;background:var(--soft);color:var(--green);font-weight:700;border-radius:30px;padding:10px 22px;margin:0}.welcome-hero+.language-choices{padding-top:36px}
