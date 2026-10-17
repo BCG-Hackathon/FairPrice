@@ -134,7 +134,11 @@ def delete_contact(contact_id: int, db: DbSession, settings: AppSettings,
 @router.get("/staff-key", include_in_schema=False)
 def staff_key(request: Request, settings: AppSettings, response: Response):
     """Fill in the staff key on the kiosk machine itself (local environment, loopback requests only)."""
-    if settings.environment != "local" or not request.client or request.client.host not in {"127.0.0.1", "::1"}:
+    # Requests through a tunnel or proxy (ngrok, Cloudflare...) also arrive from 127.0.0.1; never give them the key.
+    proxied = any(h in request.headers for h in ("x-forwarded-for", "x-forwarded-host", "forwarded", "x-real-ip",
+                                                   "cf-connecting-ip", "ngrok-skip-browser-warning", "x-original-host"))
+    if (settings.environment != "local" or proxied or not request.client
+            or request.client.host not in {"127.0.0.1", "::1"}):
         raise HTTPException(404)
     response.headers["Cache-Control"] = "no-store"
     return {"key": settings.admin_token}
