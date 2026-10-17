@@ -1,78 +1,68 @@
-"""Read the versioned ML snapshot; preserve each market's observation date."""
-import json
-from datetime import date
-from pathlib import Path
-from .pricing import grade_prices, POLICY_VERSION
+"""Lookups for crops, markets and kiosks, including free-text matching for SMS keywords."""
 
-ROOT = Path(__file__).resolve().parents[3]
-ARTIFACTS = ROOT / "ml" / "artifacts"
-CROP_META = {
-    "beans": ("Beans", "Maharagwe", "grains", "Dry beans"),
-    "maize": ("Maize", "Mahindi", "grains", "Maize grain"),
-    "sorghum": ("Sorghum", "Mtama", "grains", "Sorghum grain"),
-    "millet": ("Millet", "Uwele", "grains", "Millet grain; variety unspecified"),
-    "cassava_fresh": ("Fresh cassava", "Muhogo mbichi", "vegetables", "Fresh roots, not flour"),
-    "leafy_vegetables": ("Leafy vegetables", "Mboga za majani", "vegetables", "Mixed category; species unspecified"),
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.i18n import CATALOGS
+from app.models import Category, Crop, Kiosk, Market
+
+# Extra spellings people type by SMS (codes and translated names are matched automatically).
+CROP_ALIASES: dict[str, str] = {
+    "CORN": "maize",
+    "MATOOKE": "banana",
+    "BANANAS": "banana",
+    "AVOCADOS": "avocado",
+    "TOMATOES": "tomato",
+    "MANGOES": "mango",
+    "BEAN": "beans",
 }
 
 
-def load_snapshot():
-    return json.loads((ARTIFACTS / "price_snapshot.json").read_text(encoding="utf-8"))
+def list_crops(db: Session, category: Category | None = None) -> list[Crop]:
+    stmt = select(Crop).order_by(Crop.sort_order, Crop.code)
+    if category:
+        stmt = stmt.where(Crop.category == category)
+    return list(db.scalars(stmt))
 
 
-def catalogue():
-    snapshot = load_snapshot()
-    present = {r["crop"] for r in snapshot["rows"]}
-    return {"source": snapshot["source"], "generated_at": snapshot["generated_at"],
-            "data_end": snapshot["data_end"], "crops": [
-        {"id": k, "name": v[0], "name_sw": v[1], "category": v[2], "form": v[3],
-         "image": f"/assets/{k}.svg",
-         "markets": sorted({r["market"] for r in snapshot["rows"] if r["crop"] == k})}
-        for k, v in CROP_META.items() if k in present]}
+def list_markets(db: Session) -> list[Market]:
+    return list(db.scalars(select(Market).order_by(Market.sort_order, Market.code)))
 
 
-def prices(crop, market=None, today=None):
-    if crop not in CROP_META:
-        raise KeyError("Crop not supported by the pricing data")
-    snapshot = load_snapshot()
-    candidates = [r for r in snapshot["rows"] if r["crop"] == crop and
-                  (market is None or r["market"] == market)]
-    if not candidates:
-        raise KeyError("No price for that crop and market")
-    # Prefer the most recent observation per market; use actual wholesale on ties.
-    selected = {}
-    for row in candidates:
-        rank = (row["last_month"], row["observed_price_type"] == "Wholesale")
-        old = selected.get(row["market"])
-        if old is None or rank > (old["last_month"], old["observed_price_type"] == "Wholesale"):
-            selected[row["market"]] = row
-    now = today or date.today()
-    output = []
-    for row in selected.values():
-        r = dict(row)
-        year, month = map(int, r["last_month"].split("-"))
-        age = max(0, (now.year - year) * 12 + now.month - month)
-        r.update({"age_months": age, "stale": age > 6,
-                  "price_status": "observed wholesale" if r["observed_price_type"] == "Wholesale"
-                                  else "estimated wholesale from retail",
-                  "grade_prices": grade_prices(r["market_price"]),
-                  "grade_policy": POLICY_VERSION,
-                  "forecast_is_past": r["forecast_month"] < now.strftime("%Y-%m"),
-                  "grade_notice": "Indicative adjustments: A +4%, B base, C -5.5%. Not official UNBS price rules."})
-        output.append(r)
-    output.sort(key=lambda r: (not r["core_area"], -int(r["last_month"].replace("-", "")), r["market"]))
-    return {"crop": crop, "crop_name": CROP_META[crop][0], "source": snapshot["source"],
-            "generated_at": snapshot["generated_at"], "data_end": snapshot["data_end"],
-            "rows": output}
+def list_kiosks(db: Session) -> list[Kiosk]:
+    return list(db.scalars(select(Kiosk).order_by(Kiosk.code)))
 
 
-def sms_preview(crop, market, grade="B", language="en"):
-    if grade not in {"A", "B", "C"}:
-        raise ValueError("Choose grade A, B or C")
-    row = prices(crop, market)["rows"][0]
-    name = CROP_META[crop][1 if language == "sw" else 0]
-    text = (f"FairPrice: {name}, {market}. {grade}: UGX {row['grade_prices'][grade]}/kg. "
-            f"{'Mwezi' if language == 'sw' else 'Recorded'} {row['last_month']}. "
-            f"{'Bei ya makadirio' if language == 'sw' else 'Indicative estimate'}. WFP/HDX.")
-    return {"message": text, "status": "preview_only", "sent": False,
-            "notice": "Preview only. No SMS provider is connected."}
+def get_crop(db: Session, code: str) -> Crop | None:
+    return db.scalar(select(Crop).where(Crop.code == code.lower()))
+
+
+def get_market(db: Session, code: str) -> Market | None:
+    return db.scalar(select(Market).where(Market.code == code.upper()))
+
+
+def get_kiosk(db: Session, code: str) -> Kiosk | None:
+    return db.scalar(select(Kiosk).where(Kiosk.code == code.upper()))
+
+
+def match_crop(db: Session, text: str) -> Crop | None:
+    """Match a crop by code, alias, or its name in any supported language."""
+    word = text.strip().upper()
+    code = CROP_ALIASES.get(word)
+    if code is None:
+        for catalog in CATALOGS.values():
+            for key, value in catalog.items():
+                if key.startswith("crop.") and value.upper() == word:
+                    code = key.removeprefix("crop.")
+                    break
+            if code:
+                break
+    return get_crop(db, code or word)
+
+
+def match_market(db: Session, text: str) -> Market | None:
+    word = text.strip().upper()
+    market = get_market(db, word)
+    if market:
+        return market
+    return next((m for m in list_markets(db) if m.name.upper().startswith(word)), None)

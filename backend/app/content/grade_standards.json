@@ -1,0 +1,34 @@
+{
+  "avocado": {
+    "A": {"title": "Category A: Standard / Export", "points": ["Firm when pressed gently", "Skin unbroken, no black patches", "Stem attached, fruit not yet ripe", "Travels well: 7-10 days"], "image": "/grades/avocado_a.jpg"},
+    "B": {"title": "Category B: Sell within 3 days", "points": ["Soft or already ripe", "Small blemishes or scratches", "Mixed sizes", "Best for local market or processors"], "image": "/grades/avocado_b.jpg"}
+  },
+  "banana": {
+    "A": {"title": "Category A: Standard", "points": ["Green, full and firm fingers", "Clean bunch, no bruises", "Fingers well spaced and even", "Travels well: 5-7 days"], "image": "/grades/banana_a.jpg"},
+    "B": {"title": "Category B: Sell within 4 days", "points": ["Turning yellow or ripe", "Bruised or split fingers", "Small or uneven bunch", "Best for local market"], "image": "/grades/banana_b.jpg"}
+  },
+  "mango": {
+    "A": {"title": "Category A: Standard / Export", "points": ["Firm, mature green to turning", "No black spots or sap burn", "Uniform size", "Travels well: 5-7 days"], "image": "/grades/mango_a.jpg"},
+    "B": {"title": "Category B: Sell within 3 days", "points": ["Soft or fully ripe", "Spots, scratches or sap marks", "Mixed sizes", "Best for juice, drying or local market"], "image": "/grades/mango_b.jpg"}
+  },
+  "maize": {
+    "A": {"title": "Category A: Standard (dry grain)", "points": ["Dry: grain snaps, does not bend", "Clean, no stones or dust", "Few broken or rotten grains", "No mould or weevils"], "image": "/grades/maize_a.jpg"},
+    "B": {"title": "Category B: Sell within 2 weeks", "points": ["Still slightly moist", "Some broken or discoloured grains", "Mixed with chaff", "Dry further or sell locally soon"], "image": "/grades/maize_b.jpg"}
+  },
+  "beans": {
+    "A": {"title": "Category A: Standard", "points": ["Dry and hard", "One variety, even colour", "Clean, no stones", "No holes from weevils"], "image": "/grades/beans_a.jpg"},
+    "B": {"title": "Category B: Sell within 3 weeks", "points": ["Mixed varieties or colours", "Some split or shrivelled beans", "Slight moisture", "Sort and dry, or sell locally"], "image": "/grades/beans_b.jpg"}
+  },
+  "tomato": {
+    "A": {"title": "Category A: Standard", "points": ["Firm, turning red", "Smooth skin, no cracks", "Even size", "Travels well: 4-6 days"], "image": "/grades/tomato_a.jpg"},
+    "B": {"title": "Category B: Sell within 2 days", "points": ["Fully ripe and soft", "Small cracks or marks", "Mixed sizes", "Sell today at the nearest market"], "image": "/grades/tomato_b.jpg"}
+  },
+  "cassava": {
+    "A": {"title": "Category A: Standard (fresh roots)", "points": ["Harvested within 1 day", "Roots whole, not broken", "White flesh, no streaks", "Clean of soil"], "image": "/grades/cassava_a.jpg"},
+    "B": {"title": "Category B: Sell within 3 days", "points": ["Harvested 2+ days ago", "Broken or damaged roots", "Blue-black streaks starting", "Peel and dry, or sell locally"], "image": "/grades/cassava_b.jpg"}
+  },
+  "coffee": {
+    "A": {"title": "Category A: FAQ standard", "points": ["Well dried (about 13% moisture)", "Even beans, few black or broken", "Clean, no foreign matter", "No mould smell"], "image": "/grades/coffee_a.jpg"},
+    "B": {"title": "Category B: Below FAQ", "points": ["Not fully dried", "Many black, broken or insect beans", "Mixed with husks", "Re-dry and sort before selling"], "image": "/grades/coffee_b.jpg"}
+  }
+}

@@ -17,7 +17,7 @@ async function api(path) {
     throw error;
   }
 }
-const image = c => `<img src="${esc(c.image)}" alt="${esc(cropName(c))} illustration">`;
+const image = c => `<img src="${esc(c.image)}" alt="${esc(cropName(c))}">`;
 function render(){
   document.documentElement.lang=state.lang;
   $('#language').textContent=text('English / Kiswahili','Kiswahili / English');
@@ -25,7 +25,7 @@ function render(){
   if(state.screen==='welcome') {
     app.innerHTML=`<div class="intro"><div class="plant" aria-hidden="true">🌱</div><h1>${text('Know your crop’s value.','Fahamu thamani ya mazao yako.')}</h1><p class="muted">${text('Compare published market prices before you sell. No account or phone required at the kiosk.','Linganisha bei za soko zilizochapishwa kabla ya kuuza. Huhitaji akaunti au simu kwenye kioski.')}</p><h2>${text('Choose your language','Chagua lugha')}</h2><div class="big-actions"><button class="primary" data-lang="en">English</button><button data-lang="sw">Kiswahili</button></div><p class="form-note">${text('Monthly WFP data · Northern Uganda · Six supported crops','Takwimu za kila mwezi za WFP · Uganda Kaskazini · Mazao sita')}</p></div>`;
   } else if(state.screen==='categories') {
-    app.innerHTML=`<button class="back" data-back="welcome">← ${text('Language','Lugha')}</button><div class="intro"><h1>${text('What do you grow?','Unalima nini?')}</h1><p class="muted">${text('Choose a category to check market prices.','Chagua aina ya mazao kuona bei za soko.')}</p></div><div class="big-actions"><button class="category" data-category="grains"><img src="/assets/maize.svg" alt="">${text('Grains & beans','Nafaka na maharagwe')}</button><button class="category" data-category="vegetables"><img src="/assets/cassava_fresh.svg" alt="">${text('Vegetables & roots','Mboga na mizizi')}</button></div><p class="muted" style="text-align:center">${text('Only crops available in our dataset are shown.','Tunaonyesha mazao yaliyopo kwenye takwimu zetu pekee.')}</p>`;
+    app.innerHTML=`<button class="back" data-back="welcome">← ${text('Language','Lugha')}</button><div class="intro"><h1>${text('What do you grow?','Unalima nini?')}</h1><p class="muted">${text('Choose a category to check market prices.','Chagua aina ya mazao kuona bei za soko.')}</p></div><div class="big-actions"><button class="category" data-category="grains"><img src="/assets/maize.png" alt="">${text('Grains & beans','Nafaka na maharagwe')}</button><button class="category" data-category="vegetables"><img src="/assets/cassava_fresh.png" alt="">${text('Vegetables & roots','Mboga na mizizi')}</button></div><p class="muted" style="text-align:center">${text('Only crops available in our dataset are shown.','Tunaonyesha mazao yaliyopo kwenye takwimu zetu pekee.')}</p>`;
   } else if(state.screen==='list') {
     app.innerHTML=`<button class="back" data-back="categories">← ${text('Categories','Aina za mazao')}</button><div class="list-head"><div><h1>${state.category==='grains'?text('Grains & beans','Nafaka na maharagwe'):text('Vegetables & roots','Mboga na mizizi')}</h1><p class="muted">${text('Choose your crop','Chagua zao lako')}</p></div><input id="search" type="search" placeholder="${text('Search crops…','Tafuta mazao…')}" aria-label="${text('Search crops','Tafuta mazao')}"></div><div class="crop-list" id="crop-list"></div>`;
     renderList(''); $('#search').addEventListener('input',e=>renderList(e.target.value));

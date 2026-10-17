@@ -9,7 +9,7 @@ The inspected remote branches were:
 | Branch | Commit | Actual contents |
 |---|---|---|
 | main | c3d41cb | Architecture plan and placeholder folders/files |
-| feat/backend-scrape | c3d41cb | Same commit as main; no additional backend implementation |
+| feat/backend-scrape | 79bbdd4 | Initially matched main; updated during integration with a SQLAlchemy backend, API routes, demo seeding, menus, SMS/USSD and tests; now merged |
 | ml-pricing | ad5cb89 | Ingestion, features, LightGBM training, saved model, processed observations, snapshots and metrics |
 | integration/original-ui-pricing | integration work | Starts at ml-pricing; adds the API, kiosk, crop illustrations, SMS preview and checks |
 
@@ -28,7 +28,7 @@ WFP Uganda monthly prices, filtered by the team's ingestion code to Northern Uga
 | Fresh cassava | 448 | 7 | 2020-12 | 2026-08 | 28.12% | 32.36% |
 | Leafy vegetables | 446 | 7 | 2020-12 | 2026-08 | 30.77% | 36.07% |
 
-Not every crop exists in Gulu or Lira. The selector uses actual markets available per crop. Leafy vegetables are a source category, not evidence for spinach/okra/any particular species. Fresh cassava is not cassava flour. Six original SVG illustrations distinguish these crops without claiming photo-based grading or official quality certification.
+Not every crop exists in Gulu or Lira. The selector uses actual markets available per crop. Leafy vegetables are a source category, not evidence for spinach/okra/any particular species. Fresh cassava is not cassava flour. Six realistic AI-generated PNG crop images replace the initial SVG illustrations at the user's request. These are identification images, not official grading examples or real crop samples photographed in Uganda.
 
 Source: https://data.humdata.org/dataset/wfp-food-prices-for-uganda. The raw downloaded CSV was not committed, so its provenance and cleaning cannot yet be independently re-created from the original download. Snapshot dates are preserved, not changed to the launch date.
 
@@ -67,19 +67,21 @@ The app uses saved ML outputs for fast deterministic service. It does not load a
 
 No registration: choose English/Kiswahili, choose category, search/select crop, select market, see dated values, optionally read aloud or open SMS preview. Back buttons return to crop/category/language; header returns home. SMS preview can independently choose crop, market and grade and calls the same pricing service. No phone number is collected and no message is sent.
 
-The backend mounts the frontend and assets on the same host. A service worker caches public app files, and the frontend stores successfully retrieved public records with cache timestamps. Offline use is limited to records already opened, after the initial online setup. The cache timestamp never replaces the observation month. SMS preview requires the backend. Browser speech depends on device voices, and no Acholi language support is claimed.
+The teammate's FastAPI factory and SQLAlchemy database are now used directly. Startup in default published mode imports reviewed ML outputs into the existing crop/market/observation/forecast models and a new full-provenance PublishedPrice table. Kiosk routes query this database. The existing `/api/v1/prices/snapshot` also exposes matching A/B/C amounts and a pricing notice. A parity test checks this connection. Published mode does not seed farmers, group leaders, invented current prices or unsupported fruit crops. Existing reporting/offer/SMS/USSD code is preserved as an opt-in synthetic demo mode, outside the active kiosk flow. A database containing synthetic seed observations is rejected in published mode.
+
+The backend mounts the frontend and assets on the same host. A service worker caches public app files, and the frontend stores successfully retrieved public records with cache timestamps. Offline use is limited to records already opened, after the initial online setup. The cache timestamp never replaces the observation month. SMS preview requires the backend. Browser speech depends on device voices, and no Acholi language support is claimed in the public kiosk. The legacy demo mode's Acholi templates are not validated by this integration.
 
 ## Checks and launch
 
 Use README's PowerShell commands. The API starts at http://127.0.0.1:8000; docs at `/docs`. Tests check the six crops/assets, all returned markets, valid positive amounts, decimal rounding, calendar staleness, kiosk/SMS equality, missing crop/market and invalid grades. JavaScript syntax checks cover the kiosk and service worker. `ml/verify_saved.py` verifies saved-model forecasts and reproduces evaluation without replacing team artifacts.
 
-Backend/API and model verification were executed locally. Browser layout, speech, real handset SMS and service-worker offline reload require device/browser acceptance; file/API checks alone do not prove them. No Azure deployment or paid services were started.
+All 50 merged backend tests passed, including original demo-mode tests and published-data kiosk/DB parity tests. DOM checks passed all six crop journeys, search, market changes, grade values, SMS parity, back/home navigation, language toggling, training panel and saved-record offline fallback. The running app was also inspected in the in-app browser at its narrow viewport and the new photo-based crop list was visibly confirmed; see `docs/kiosk-photos-preview.png`. Device speech, real handset SMS and service-worker offline reload still require acceptance checks. No Azure deployment or paid services were started.
 
 ## Next work, in priority order
 
 1. **Data analyst:** provide the raw source CSV, retrieval date and source hash. Review `ingest_wfp.py`: its centred seven-record outlier median uses future records, so use a causal trailing/reference-only cleaning rule and evaluate sensitivity. Preserve/flag suspicious observations rather than silently discarding genuine shocks. Re-ingest and retrain before strengthening accuracy claims.
 2. **ML analyst:** reserve an untouched final time window after model/baseline selection, run rolling-origin evaluation and report errors per market/crop plus prediction intervals. Fit any retail-to-wholesale conversion only on the applicable historical training window. The current retail forecast scores do not validate wholesale conversion errors or grade premiums. Same-month cross-market features also assume all monthly reports are available at inference time; enforce publication lags for live forecasting.
-3. **Backend developer:** automate permitted source refreshes, validate records before replacing the public snapshot, retain versions, and only publish forecasts whose origin/horizon match the intended use. A database and Azure refresh deployment are next steps, not already functioning services. Keep credentials server-side.
+3. **Backend developer:** automate permitted source refreshes, validate records before replacing the public snapshot, retain versions, and only publish forecasts whose origin/horizon match the intended use. SQLite is integrated locally; Azure SQL/refresh deployment is a next step. The active API does not collect live field reports. Keep credentials server-side and review imported backend modules before activating their broader functionality.
 4. **UX/field reviewer:** check local language and crop terminology, official crop-specific quality criteria, photos if needed, tablet readability, touch targets, speech availability and offline reload. Validate that users understand estimated wholesale versus an actual buyer offer.
 5. **SMS developer:** provision a Uganda-capable provider/sender ID, handle consent for requested messages, rate limits, costs and multipart length, and persist provider delivery states. A preview is not a real handset test. No unsolicited broadcast is included.
 6. **Demo lead:** show beans or maize first, disclose the recorded month and conversion, compare A/B/C, then show the basic-phone preview. Explain that transparency can improve negotiation; do not claim that this prototype has already raised incomes or ended hunger.

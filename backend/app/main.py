@@ -1,74 +1,85 @@
-"""Local demo API and original-layout kiosk, served from one origin."""
-import json
-from pathlib import Path
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
-from .services.catalog import catalogue, prices, sms_preview, ARTIFACTS
+"""FastAPI application factory.
 
-ROOT = Path(__file__).resolve().parents[2]
-app = FastAPI(title="FairPrice", version="0.1.0")
+Run locally:  uvicorn app.main:app --reload   (from the backend/ folder)
+"""
 
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
-@app.get("/health")
-def health():
-    data = catalogue()
-    return {"status": "ok", "data_end": data["data_end"], "crops": len(data["crops"]),
-            "mode": "published_snapshot", "sms": "preview_only"}
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
+from app import models  # noqa: F401  (registers tables on Base.metadata)
+from app.api import api_router
+from app.config import Settings, get_settings
+from app.db import Base, build_engine, build_session_factory
+from app.seed import seed
+from app.services.sms_gateway import OutboxGateway
+from app.services.transport import EstimatedTransport
+from app.services.published_seed import seed_published
+from app.api import kiosk
 
-@app.get("/api/crops")
-def crops():
-    return catalogue()
-
-
-@app.get("/api/prices/{crop}")
-def price_lookup(crop: str, market: str | None = None):
-    try:
-        return prices(crop, market)
-    except KeyError as exc:
-        raise HTTPException(404, str(exc)) from exc
+logger = logging.getLogger("fairprice")
 
 
-class SMSPreview(BaseModel):
-    crop: str = Field(max_length=60)
-    market: str = Field(max_length=120)
-    grade: str = Field(default="B", pattern="^[ABC]$")
-    language: str = Field(default="en", pattern="^(en|sw)$")
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
+    logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        Base.metadata.create_all(app.state.engine)
+        if settings.seed_on_startup:
+            with app.state.session_factory() as db:
+                if settings.data_mode == "published":
+                    seed_published(db, settings)
+                else:
+                    seed.run(db, settings)
+        logger.info("FairPrice API ready (env=%s)", settings.environment)
+        yield
+        app.state.engine.dispose()
+
+    app = FastAPI(
+        title=settings.app_name,
+        version="0.1.0",
+        description=(
+            "Ground-truth market prices for smallholder farmers in Northern Uganda. "
+            "Serves the kiosk tablet app and the SMS/USSD channels for feature phones."
+        ),
+        lifespan=lifespan,
+    )
+    engine = build_engine(settings.database_url)
+    app.state.settings = settings
+    app.state.engine = engine
+    app.state.session_factory = build_session_factory(engine)
+    app.state.transport = EstimatedTransport(settings)
+    app.state.sms_gateway = OutboxGateway()
+
+    app.add_middleware(GZipMiddleware, minimum_size=500)  # low-bandwidth kiosks
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["ETag"],
+    )
+    if settings.data_mode == "demo":
+        app.include_router(api_router)
+    else:
+        # Keep synthetic reporting/registry/offer demos out of the public kiosk flow.
+        from app.api import catalog, prices, status
+        for module in (catalog, prices, status):
+            app.include_router(module.router, prefix="/api/v1")
+    app.include_router(kiosk.app)
+    kiosk.mount_assets(app)
+
+    @app.get("/health", tags=["status"], summary="Liveness probe")
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    return app
 
 
-@app.post("/api/sms/preview")
-def preview(body: SMSPreview):
-    try:
-        return sms_preview(body.crop, body.market, body.grade, body.language)
-    except KeyError as exc:
-        raise HTTPException(404, str(exc)) from exc
-
-
-@app.get("/api/training")
-def training():
-    metrics = json.loads((ARTIFACTS / "metrics.json").read_text())
-    return {"metrics": metrics, "serving": "Precomputed team snapshot, not live inference",
-            "limitations": [
-                "Monthly data ends August 2026; forecasts are historical as of October 2026.",
-                "Retail-to-wholesale factors are measured for beans/maize, assumed for four crops.",
-                "Raw CSV is not committed: preprocessing cannot yet be reproduced from the original source.",
-                "Original ingestion uses a centred outlier filter; historical scores need a causal re-ingestion audit.",
-                "The same holdout selects model versus baseline; scores are development evidence, not an independent final test.",
-            ]}
-
-
-@app.get("/")
-def kiosk():
-    return FileResponse(ROOT / "frontend" / "index.html")
-
-
-@app.get("/sw.js")
-def service_worker():
-    return FileResponse(ROOT / "frontend" / "public" / "sw.js", media_type="application/javascript",
-                        headers={"Cache-Control": "no-cache"})
-
-
-app.mount("/assets", StaticFiles(directory=ROOT / "frontend" / "public" / "assets"), name="assets")
-app.mount("/static", StaticFiles(directory=ROOT / "frontend" / "src"), name="static")
+app = create_app()

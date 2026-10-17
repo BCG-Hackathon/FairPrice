@@ -1,0 +1,3 @@
+# Extra driver for Azure SQL (needs Microsoft ODBC Driver 18 on the host / in the Docker image)
+-r requirements.txt
+pyodbc

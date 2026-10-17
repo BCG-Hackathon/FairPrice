@@ -1,5 +1,5 @@
-const CACHE = 'fairprice-original-v1';
-const SHELL = ['/', '/static/style.css', '/static/app.js', ...['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/${c}.svg`)];
+const CACHE = 'fairprice-original-v2-photos';
+const SHELL = ['/', '/static/style.css', '/static/app.js', ...['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/${c}.png`)];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fairprice-original-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 // Cache only this app's shell. API records use explicit dated localStorage entries in app.js.
