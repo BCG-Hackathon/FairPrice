@@ -30,7 +30,7 @@ CATEGORY_LABEL = {
 }
 TEXT = {
     "en": {
-        "farmer_title": ("FairPrice market prices\nPrice for 1 kg in Uganda shillings (UGX)\n"
+        "farmer_title": ("Fair Value Updates\nPrice for 1 kg in Uganda shillings (UGX)\n"
                          "Grade A = best, B = good, C = lower quality"),
         "none": "No changes",
         "trend": {"up": "rising", "down": "falling", "steady": "steady"},
@@ -42,7 +42,7 @@ TEXT = {
         "stale_note": "* older than 6 months. ",
     },
     "sw": {
-        "farmer_title": ("FairPrice bei za soko\nBei ya kilo 1 kwa shilingi za Uganda (UGX)\n"
+        "farmer_title": ("Taarifa za Fair Value\nBei ya kilo 1 kwa shilingi za Uganda (UGX)\n"
                          "Daraja A = bora, B = nzuri, C = ubora wa chini"),
         "none": "Hakuna mabadiliko",
         "trend": {"up": "inapanda", "down": "inashuka", "steady": "imetulia"},

@@ -1,4 +1,4 @@
-const CACHE = 'fairprice-original-v12-sms-recipients';
+const CACHE = 'fairprice-original-v13-fair-value-updates';
 const SHELL = ['/', '/static/style.css', '/static/design.css', '/static/flow.js'];
 SHELL.push(...['english.png','swahili.png','logo-white.png','logo-green.png'].map(n=>'/assets/design/'+n));
 const PHOTOS = ['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/${c}.png`);
