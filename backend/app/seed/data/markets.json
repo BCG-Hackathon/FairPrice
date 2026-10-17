@@ -1,0 +1,8 @@
+[
+  {"code": "GULU", "name": "Gulu", "country": "UG", "region": "Northern Uganda", "latitude": 2.7747, "longitude": 32.2990, "currency": "UGX", "sort_order": 1},
+  {"code": "LIRA", "name": "Lira", "country": "UG", "region": "Northern Uganda", "latitude": 2.2499, "longitude": 32.8999, "currency": "UGX", "sort_order": 2},
+  {"code": "KITGUM", "name": "Kitgum", "country": "UG", "region": "Northern Uganda", "latitude": 3.2783, "longitude": 32.8867, "currency": "UGX", "sort_order": 3},
+  {"code": "KAMPALA", "name": "Kampala", "country": "UG", "region": "Central Uganda", "latitude": 0.3476, "longitude": 32.5825, "currency": "UGX", "sort_order": 4},
+  {"code": "KISUMU", "name": "Kisumu", "country": "KE", "region": "Western Kenya", "latitude": -0.0917, "longitude": 34.7680, "currency": "KES", "sort_order": 5},
+  {"code": "NAIROBI", "name": "Nairobi", "country": "KE", "region": "Central Kenya", "latitude": -1.2921, "longitude": 36.8219, "currency": "KES", "sort_order": 6}
+]

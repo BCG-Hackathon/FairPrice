@@ -1,0 +1,10 @@
+[
+  {"code": "avocado", "name": "Avocado", "category": "fruits", "grade_b_factor": 0.60, "b_sell_within_days": 3, "sort_order": 1, "base_ugx_per_kg": 1200, "season_peak_day": 60},
+  {"code": "banana", "name": "Banana (Matooke)", "category": "fruits", "grade_b_factor": 0.70, "b_sell_within_days": 4, "sort_order": 2, "base_ugx_per_kg": 900, "season_peak_day": 200},
+  {"code": "mango", "name": "Mango", "category": "fruits", "grade_b_factor": 0.60, "b_sell_within_days": 3, "sort_order": 3, "base_ugx_per_kg": 800, "season_peak_day": 280},
+  {"code": "maize", "name": "Maize", "category": "vegetables_grains", "grade_b_factor": 0.80, "b_sell_within_days": 14, "sort_order": 4, "base_ugx_per_kg": 1100, "season_peak_day": 135},
+  {"code": "beans", "name": "Beans", "category": "vegetables_grains", "grade_b_factor": 0.80, "b_sell_within_days": 21, "sort_order": 5, "base_ugx_per_kg": 3800, "season_peak_day": 150},
+  {"code": "tomato", "name": "Tomato", "category": "vegetables_grains", "grade_b_factor": 0.55, "b_sell_within_days": 2, "sort_order": 6, "base_ugx_per_kg": 2200, "season_peak_day": 90},
+  {"code": "cassava", "name": "Cassava (fresh)", "category": "vegetables_grains", "grade_b_factor": 0.70, "b_sell_within_days": 3, "sort_order": 7, "base_ugx_per_kg": 700, "season_peak_day": 120},
+  {"code": "coffee", "name": "Coffee (Robusta FAQ)", "category": "cash_crops", "grade_b_factor": 0.75, "b_sell_within_days": 60, "sort_order": 8, "base_ugx_per_kg": 13000, "season_peak_day": 30}
+]
