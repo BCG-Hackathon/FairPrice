@@ -16,7 +16,8 @@ app = APIRouter()
 def health(db: DbSession):
     data = catalogue(db)
     return {"status": "ok", "data_end": data["data_end"], "crops": len(data["crops"]),
-            "mode": "published_snapshot", "sms": "preview_only"}
+            "mode": "published_snapshot", "sms": "preview_only", "sms_available": False,
+            "quality_grades_verified": False, "freshness_policy_months": 6}
 
 
 @app.get("/api/crops")

@@ -4,6 +4,8 @@
 
 Branch: `integration/original-ui-pricing`. See [integration and training audit](docs/INTEGRATION-AND-TRAINING.md).
 
+**Updated farmer flow:** [flow, kiosk setup and remaining limits](docs/FARMER-FLOW.md). Language → crop → market → dated reference price. Calculations are expandable; the SMS simulator and model scores are in the footer's Kiosk staff view. Staff can configure the device's default market/language and 2/3/5-minute inactivity reset. The farmer SMS action explicitly reports unavailable service and collects no number. Crop quality is separate from price adjustment; verified A/B/C quality mappings remain unfinished.
+
 This branch connects the team's saved ML pricing outputs to a working FastAPI backend and a kiosk recreated from the original green-and-white design. The remote frontend contained placeholders only. It does not use the separate polished design.
 
 ```powershell
@@ -16,9 +18,9 @@ Open http://127.0.0.1:8000. API documentation: http://127.0.0.1:8000/docs.
 
 For model verification, also install `ml/requirements.txt`, then run `python ml/verify_saved.py` with the same environment. Backend checks: install `backend/requirements-dev.txt`, then run `python -m pytest -c backend/pyproject.toml backend/tests`. UI DOM checks: `npm ci` followed by `npm run test:ui` against the running server.
 
-Supported crops: **beans, maize grain, sorghum, millet, fresh cassava and leafy vegetables**. All prices show the market and observation month. A/B/C price multipliers are **1.04 / 1.00 / 0.945**, configured application estimates, not official UNBS premiums. The optional SMS panel is a preview and sends nothing.
+Supported crops: **beans, maize grain, sorghum, millet, fresh cassava and leafy vegetables**. All prices show the market and observation month. A/B/C price multipliers are **1.04 / 1.00 / 0.945**, configured application estimates, not official UNBS premiums. The staff-only SMS simulator sends nothing; the farmer SMS action explains that real delivery is unavailable.
 
-The kiosk provides English/Kiswahili navigation, crop search, market selection, realistic AI-generated crop images, dated observations, historical forecasts, training information and browser read-aloud where supported. A service worker caches the app shell; opened crop responses are saved locally. Offline reload needs one successful online visit and service-worker installation. Unopened crops and SMS preview require connectivity. Browser speech languages depend on the installed voices; Kiswahili and crop naming need local review.
+The kiosk provides English/Kiswahili navigation, crop search, market selection, realistic AI-generated crop images, dated observations, comparison and browser read-aloud where supported. Model scores are in the staff view, separate from the farmer's price. A service worker caches the small app shell and photos as used; opened crop responses are saved locally. Offline reload needs one successful online visit and service-worker installation. Unopened crops/photos and the staff simulator require connectivity. Browser speech languages depend on installed voices; Kiswahili and crop naming need local review.
 
 The teammate's updated `feat/backend-scrape` branch (79bbdd4) is merged. Its SQLAlchemy/SQLite backend now loads the ML records with full source payloads. Default `DATA_MODE=published` uses `fairprice-published.db`, without synthetic prices or farmer registration. `/api/v1` catalog/status/prices and the kiosk endpoints share the same database and grade values. Synthetic reporting/offer/SMS/USSD demos remain available only with explicit `DATA_MODE=demo` and a separate database; they are not connected to the public kiosk flow.
 

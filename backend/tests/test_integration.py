@@ -72,6 +72,13 @@ def test_training_scores_have_limits(client):
     assert any("centred outlier" in s for s in response["limitations"])
 
 
+def test_unimplemented_capabilities_are_not_advertised(client):
+    status = client.get("/api/kiosk/status").json()
+    assert status["sms_available"] is False
+    assert status["quality_grades_verified"] is False
+    assert status["freshness_policy_months"] == 6
+
+
 def test_teammate_database_api_matches_public_kiosk(client):
     legacy = client.get("/api/v1/prices/snapshot?market=GULU").json()["items"]
     kiosk = client.get("/api/prices/beans?market=Gulu").json()["rows"][0]

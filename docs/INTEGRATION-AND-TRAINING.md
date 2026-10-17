@@ -2,6 +2,8 @@
 
 17 October 2026. Current implementation takes priority over aspirational PLAN.md.
 
+The later [farmer-flow update](FARMER-FLOW.md) supersedes this document's original header/navigation, SMS panel placement and forecast-screen descriptions. It adds a dedicated market step, device setup and inactivity reset, with the simulator and training details in a separate staff view.
+
 ## Branch evidence
 
 The inspected remote branches were:
