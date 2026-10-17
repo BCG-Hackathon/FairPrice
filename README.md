@@ -1,5 +1,14 @@
 # FairPrice
 
+The integrated kiosk now uses the original Fair Value PNG design: green brand
+header, flag-based language choices, photo categories, produce list rows and
+green grade comparison cards. The existing backend, buyer directory, market
+configuration, offline records and staff tools remain connected. Farmers select
+a crop and see its three grade cards directly; market selection, comparison and
+source details live in the staff view. Each grade includes three short quality
+bullets in English and Swahili. Open the integrated app on
+**http://127.0.0.1:8000/**.
+
 ## Working local integration — 17 October 2026
 
 Branch: `integration/original-ui-pricing`. See [integration and training audit](docs/INTEGRATION-AND-TRAINING.md).
