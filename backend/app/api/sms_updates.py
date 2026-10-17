@@ -24,7 +24,7 @@ E164 = r"^\+[1-9][0-9]{7,14}$"
 class FarmerUpdateIn(BaseModel):
     phones: list[Annotated[str, Field(pattern=E164)]] = Field(default=[], max_length=100)
     group: str | None = Field(default=None, max_length=100, description="BulkSMS phonebook group name")
-    categories: list[Literal["vegetables", "fruits", "grains"]] = ["vegetables", "fruits"]
+    categories: list[Literal["vegetables", "fruits", "grains"]] = ["vegetables", "fruits", "grains"]
     language: Literal["en", "sw"] = "en"
     dry_run: bool = Field(default=True, description="Preview only. Set false to send.")
     consent_confirmed: bool = Field(default=False, description="Recipients agreed to receive FairPrice SMS")
@@ -71,7 +71,7 @@ def _mode(settings, dry_run: bool) -> str:
     return "send"
 
 
-@router.post("/farmers", summary="SMS farmers vegetable & fruit prices with model-estimated trends")
+@router.post("/farmers", summary="SMS farmers a simple price list: vegetables, fruits, grains/crops")
 def sms_farmers(body: FarmerUpdateIn, db: DbSession, settings: AppSettings, response: Response,
                 x_admin_token: Annotated[str | None, Header()] = None):
     secure_admin(settings, x_admin_token)

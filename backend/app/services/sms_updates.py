@@ -1,12 +1,14 @@
 """SMS price updates built from the local database (the same records the kiosk shows).
 
-* Farmers: vegetables and fruits, each crop's average market price across markets with
-  recent records, plus the model's estimate and trend (from the ML team's forecasts).
+* Farmers: a simple list per category (vegetables, fruits, grains/crops): each crop's price
+  per kg for grades A/B/C (average across markets with recent records) and a one-word trend
+  from the ML team's forecasts.
 * Buyers/suppliers: for each reviewed buyer with a published phone, where their crop is
   currently traded (recent WFP market records), at their grade's price, plus the model trend.
 
 Prices are never generated here: they come from published.prices() (WFP/HDX records and the
-saved model forecasts). Text is plain GSM-7 and kept within 2 SMS parts (306 characters).
+saved model forecasts). Text is plain GSM-7; buyer texts stay within 2 SMS parts (306
+characters), the farmer list within 3 (459) so every crop gets its own line.
 """
 
 from datetime import date
@@ -16,18 +18,22 @@ from app.services.grade_policy import grade_prices
 from app.services.published import CROP_META, prices
 
 SMS_MAX_CHARS = 306
-MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+SMS_FARMER_MAX_CHARS = 459
+STEADY_BAND = 0.02  # model change within +/-2% reads as "steady"
+MONTHS = {
+    "en": ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+    "sw": ("Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ago", "Sep", "Okt", "Nov", "Des"),
+}
 CATEGORY_LABEL = {
-    "en": {"vegetables": "VEG", "fruits": "FRUIT", "grains": "GRAINS"},
+    "en": {"vegetables": "VEGETABLES", "fruits": "FRUITS", "grains": "GRAINS/CROPS"},
     "sw": {"vegetables": "MBOGA", "fruits": "MATUNDA", "grains": "NAFAKA"},
 }
 TEXT = {
     "en": {
-        "farmer_title": "FairPrice veg & fruit prices, UGX/kg grade B (avg of markets)",
-        "none": "no published prices yet",
-        "model": "model {month} {price} ({pct})",
-        "markets": "{n} mkts",
-        "footer": "Rec. {month}, WFP/HDX. Guide prices, not offers.",
+        "farmer_title": "FairPrice market prices (UGX per kg)\nA=best B=good C=lower quality",
+        "none": "No prices yet",
+        "trend": {"up": "rising", "down": "falling", "steady": "steady"},
+        "farmer_footer": "Prices of {month}. Guide only, not an offer.",
         "buyer_title": "FairPrice for {name}: {crop} grade {grade}, UGX/kg",
         "traded": "Recently traded: {places}",
         "buyer_model": "Model trend {month}: {pct}",
@@ -35,11 +41,10 @@ TEXT = {
         "stale_note": "* older than 6 months. ",
     },
     "sw": {
-        "farmer_title": "FairPrice bei za mboga na matunda, UGX/kg daraja B (wastani)",
-        "none": "bado hakuna bei",
-        "model": "modeli {month} {price} ({pct})",
-        "markets": "masoko {n}",
-        "footer": "Rek. {month}, WFP/HDX. Bei za mwongozo, si ofa.",
+        "farmer_title": "FairPrice bei za soko (UGX kwa kilo)\nA=bora B=nzuri C=ubora wa chini",
+        "none": "Bado hakuna bei",
+        "trend": {"up": "inapanda", "down": "inashuka", "steady": "imetulia"},
+        "farmer_footer": "Bei za {month}. Mwongozo tu, si ofa.",
         "buyer_title": "FairPrice kwa {name}: {crop} daraja {grade}, UGX/kg",
         "traded": "Inauzwa hivi karibuni: {places}",
         "buyer_model": "Mwenendo wa modeli {month}: {pct}",
@@ -49,12 +54,12 @@ TEXT = {
 }
 
 
-def _month(value: str | None) -> str:
+def _month(value: str | None, language: str = "en") -> str:
     """'2026-08' -> 'Aug 2026'."""
     if not value:
         return "-"
     year, month = value.split("-")[:2]
-    return f"{MONTHS[int(month) - 1]} {year}"
+    return f"{MONTHS[language][int(month) - 1]} {year}"
 
 
 def _ugx(amount: float) -> str:
@@ -96,7 +101,7 @@ def crop_summary(db, crop: str, today: date | None = None) -> dict | None:
 
 
 def farmer_update(db, categories: list[str], language: str = "en", today: date | None = None) -> dict:
-    """Card + SMS text for farmers: vegetables/fruits prices and model trends."""
+    """Card + SMS text for farmers: one line per crop with A/B/C prices per kg and a trend word."""
     text = TEXT[language]
     sections = []
     for category in categories:
@@ -113,22 +118,19 @@ def farmer_update(db, categories: list[str], language: str = "en", today: date |
         if not section["items"]:
             lines.append(f"{label}: {text['none']}")
             continue
-        parts = []
+        lines.append(label)
         for item in section["items"]:
             name = CROP_META[item["crop"]][1 if language == "sw" else 0]
-            part = f"{name} {_ugx(item['base_price'])}"
+            grades = item["grades"]
+            line = f"{name}: A {_ugx(grades['A'])} B {_ugx(grades['B'])} C {_ugx(grades['C'])}"
             if item["model"]:
-                part += ", " + text["model"].format(
-                    month=_month(item["model"]["month"]).split()[0],
-                    price=_ugx(item["model"]["price"]),
-                    pct=_pct(item["model"]["change"]),
-                )
-            part += f" [{text['markets'].format(n=item['markets'])}]"
-            parts.append(part)
-        lines.append(f"{label}: " + "; ".join(parts))
+                change = item["model"]["change"]
+                direction = "steady" if abs(change) < STEADY_BAND else "up" if change > 0 else "down"
+                line += f", {text['trend'][direction]}"
+            lines.append(line)
     recorded = max((i["recorded"] for s in sections for i in s["items"]), default=None)
-    footer = text["footer"].format(month=_month(recorded))
-    return {"sections": sections, "recorded": recorded, "sms": _fit(lines, footer)}
+    footer = text["farmer_footer"].format(month=_month(recorded, language))
+    return {"sections": sections, "recorded": recorded, "sms": _fit(lines, footer, SMS_FARMER_MAX_CHARS)}
 
 
 def buyer_update(db, listing, language: str = "en", today: date | None = None) -> dict:
@@ -139,7 +141,7 @@ def buyer_update(db, listing, language: str = "en", today: date | None = None) -
     rows = sorted(rows, key=lambda r: (r["stale"], -int(r["last_month"].replace("-", ""))))[:3]
     places = [
         f"{r['market'].split('(')[0].strip()} {_ugx(r['grade_prices'][listing.grade])} "
-        f"{_month(r['last_month'])}{'*' if r['stale'] else ''}"
+        f"{_month(r['last_month'], language)}{'*' if r['stale'] else ''}"
         for r in rows
     ]
     summary = crop_summary(db, listing.crop, today)
@@ -150,7 +152,7 @@ def buyer_update(db, listing, language: str = "en", today: date | None = None) -
     ]
     if summary and summary["model"]:
         lines.append(text["buyer_model"].format(
-            month=_month(summary["model"]["month"]), pct=_pct(summary["model"]["change"])))
+            month=_month(summary["model"]["month"], language), pct=_pct(summary["model"]["change"])))
     return {
         "buyer_id": listing.id,
         "crop": listing.crop,
@@ -162,10 +164,10 @@ def buyer_update(db, listing, language: str = "en", today: date | None = None) -
     }
 
 
-def _fit(lines: list[str], footer: str) -> str:
-    """Keep the footer (date/source) and trim the body if the SMS would exceed 2 parts."""
+def _fit(lines: list[str], footer: str, limit: int = SMS_MAX_CHARS) -> str:
+    """Keep the footer (date/source) and trim the body if the SMS would exceed the limit."""
     body = "\n".join(lines)
-    room = SMS_MAX_CHARS - len(footer) - 1
+    room = limit - len(footer) - 1
     if len(body) > room:
         body = body[: room - 3].rstrip() + "..."
     return f"{body}\n{footer}"
