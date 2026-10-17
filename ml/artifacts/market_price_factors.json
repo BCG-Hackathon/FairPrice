@@ -1,0 +1,66 @@
+{
+  "final_price_basis": "market",
+  "formula": "market price = retail price x factor",
+  "factors": {
+    "beans": {
+      "factor": 0.842,
+      "basis": "measured",
+      "months_compared": 126,
+      "markets": [
+        "Lira"
+      ],
+      "period": "2011-03 to 2022-05",
+      "note": "median of wholesale/retail for the same market and month"
+    },
+    "maize": {
+      "factor": 0.883,
+      "basis": "measured",
+      "months_compared": 129,
+      "markets": [
+        "Lira"
+      ],
+      "period": "2011-03 to 2022-05",
+      "note": "median of wholesale/retail for the same market and month"
+    },
+    "sorghum": {
+      "factor": 0.875,
+      "basis": "assumed",
+      "months_compared": 255,
+      "markets": [
+        "Lira"
+      ],
+      "period": "2011-03 to 2022-05",
+      "note": "no wholesale data for this crop; uses the median ratio of Beans and Maize combined"
+    },
+    "millet": {
+      "factor": 0.875,
+      "basis": "assumed",
+      "months_compared": 255,
+      "markets": [
+        "Lira"
+      ],
+      "period": "2011-03 to 2022-05",
+      "note": "no wholesale data for this crop; uses the median ratio of Beans and Maize combined"
+    },
+    "cassava_fresh": {
+      "factor": 0.875,
+      "basis": "assumed",
+      "months_compared": 255,
+      "markets": [
+        "Lira"
+      ],
+      "period": "2011-03 to 2022-05",
+      "note": "no wholesale data for this crop; uses the median ratio of Beans and Maize combined"
+    },
+    "leafy_vegetables": {
+      "factor": 0.875,
+      "basis": "assumed",
+      "months_compared": 255,
+      "markets": [
+        "Lira"
+      ],
+      "period": "2011-03 to 2022-05",
+      "note": "no wholesale data for this crop; uses the median ratio of Beans and Maize combined"
+    }
+  }
+}
