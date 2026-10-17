@@ -23,3 +23,9 @@ ml/data/raw/*
 Thumbs.db
 .vscode/
 .idea/
+
+# Local exploration (not part of the project)
+explore_uganda_prices.py
+data.ipynb
+results/
+/wfp_food_prices_uga.csv
