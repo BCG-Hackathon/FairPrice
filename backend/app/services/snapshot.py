@@ -41,7 +41,7 @@ class RefreshResult:
     generated_at: datetime
 
 
-def refresh_snapshots(db: Session, settings: Settings) -> RefreshResult:
+def refresh_snapshots(db: Session, settings: Settings, commit: bool = True) -> RefreshResult:
     generated_at = utcnow()
     crops = {c.id: c for c in db.scalars(select(Crop))}
 
@@ -81,6 +81,8 @@ def refresh_snapshots(db: Session, settings: Settings) -> RefreshResult:
         forecast, forecast_source = _forecast(db, market_id, crop_id, as_of, points)
         # WFP values are ungraded base estimates, never observed A-grade offers.
         adjusted = grade_prices(price_a) if "wfp_snapshot" in sources else None
+        if adjusted and forecast_source == "naive_trend":
+            forecast, forecast_source = None, None  # source refresh is not a forecast training run
 
         db.add(
             PriceSnapshot(
@@ -99,7 +101,10 @@ def refresh_snapshots(db: Session, settings: Settings) -> RefreshResult:
             )
         )
         count += 1
-    db.commit()
+    if commit:
+        db.commit()
+    else:
+        db.flush()
     return RefreshResult(snapshots=count, generated_at=generated_at)
 
 

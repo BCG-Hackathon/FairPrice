@@ -6,11 +6,14 @@ Branch: `integration/original-ui-pricing`. See [integration and training audit](
 
 **Updated farmer flow:** [flow, kiosk setup and remaining limits](docs/FARMER-FLOW.md). Language → crop → market → dated reference price. Calculations are expandable; the SMS simulator and model scores are in the footer's Kiosk staff view. Staff can configure the device's default market/language and 2/3/5-minute inactivity reset. The farmer SMS action explicitly reports unavailable service and collects no number. Crop quality is separate from price adjustment; verified A/B/C quality mappings remain unfinished.
 
+**Latest revision:** [visible grade images, potential buyers and secure source automation](docs/BUYERS-GRADES-AUTOMATION.md). A/B/C cards are now visible with illustrative quality/freshness images. Their actions list registered buyers for that exact crop/grade; buyers submit no offer price. Registrations require publication consent and staff approval, and expire after 30 days. Use `python tools/configure_local.py` to generate a private local staff key and enable daily source checks. A small 32-tree anomaly model audits source changes; only validated source observations update the database. Latest verified source month remains August 2026.
+
 This branch connects the team's saved ML pricing outputs to a working FastAPI backend and a kiosk recreated from the original green-and-white design. The remote frontend contained placeholders only. It does not use the separate polished design.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt
+.\.venv\Scripts\python.exe tools/configure_local.py
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 

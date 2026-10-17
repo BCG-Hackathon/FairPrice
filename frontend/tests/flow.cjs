@@ -22,13 +22,16 @@ async function main(){
     const select=d.querySelector('#market');select.selectedIndex=select.options.length-1;select.dispatchEvent(new w.Event('change'));
     const market=select.value;click('#view-price');
     assert.equal(d.querySelector('.detail-top h1').textContent,crop.name);
-    assert.equal(d.querySelectorAll('.grade').length,3);assert.equal(d.querySelectorAll('.grade img').length,0);
+    assert.equal(d.querySelectorAll('.grade').length,3);assert.equal(d.querySelectorAll('.grade-photo').length,3);
+    assert.equal(new Set([...d.querySelectorAll('.grade-photo')].map(n=>n.style.backgroundPosition)).size,3);
     assert.equal(d.querySelector('.detail-top img').getAttribute('src'),crop.image);
     const row=(await(await fetch(base+`/api/prices/${crop.id}?market=${encodeURIComponent(market)}`)).json()).rows[0];
     assert.ok(d.querySelector('.base-price strong').textContent.includes(new Intl.NumberFormat('en-UG').format(row.market_price)));
     for(const[i,g]of['A','B','C'].entries())assert.equal(d.querySelectorAll('.grade .price')[i].textContent,new Intl.NumberFormat('en-UG').format(row.grade_prices[g]));
-    assert.equal(d.querySelector('.calculation').open,false);assert.equal(d.querySelector('.grade-details').open,false);
-    click('#send-sms');assert.ok(d.querySelector('#modal-content').textContent.includes('not available'));assert.equal(d.querySelector('input[type=tel]'),null);click('.close');
+    assert.equal(d.querySelector('.calculation').open,false);assert.equal(d.querySelectorAll('[data-buyers-grade]').length,3);
+    assert.equal(d.querySelector('#send-sms'),null);
+    click('[data-buyers-grade="B"]');await wait(()=>d.querySelector('.buyer-list'));assert.ok(d.querySelector('#modal-content').textContent.includes('No prices'));
+    click('#register-this-buyer');assert.equal(d.querySelector('#buyer-crop').value,crop.id);assert.equal(d.querySelector('#buyer-grade').value,'B');assert.equal(d.querySelector('#buyer-phone').disabled,true);assert.equal(d.querySelector('#buyer-consent').required,true);click('.close');
     click('#compare-open');assert.equal(d.querySelectorAll('tbody tr').length,crop.markets.length);assert.ok(d.querySelector('#modal-content').textContent.includes('Transport costs are not included'));click('.close');
     click('[data-back="market"]');click('[data-back="list"]');click('[data-back="categories"]');
   }
@@ -42,7 +45,7 @@ async function main(){
   d.querySelector('#kiosk-name').value='Gulu kiosk';d.querySelector('#default-market').value='Gulu';d.querySelector('#setup-form').dispatchEvent(new w.Event('submit',{cancelable:true}));assert.ok(w.localStorage.getItem('fairprice:setup').includes('Gulu kiosk'));
   click('#start-over');click('[data-lang="en"]');click('[data-category="grains"]');click('[data-crop="maize"]');await wait(()=>d.querySelector('#view-price'));assert.equal(d.querySelector('#market').value,'Gulu');
   clock+=105001;tick();assert.equal(d.querySelector('#idle-notice').hidden,false);clock+=15000;tick();assert.ok(d.querySelector('[data-lang="en"]'));assert.equal(d.querySelector('#modal').open,false);assert.equal(d.querySelector('#market'),null);
-  console.log('PASS: six crop-market-price flows; grade policy; old-data warning; comparison; farmer SMS unavailable/no phone collection; staff tools; offline fallback; 404 invalidates cache; device setup; idle warning/reset.');
+  console.log('PASS: six crop-market-price flows; distinct grade images; crop/grade buyer directory and opt-in registration; no buyer prices; old-data warning; comparison; staff tools; offline fallback; cache invalidation; setup; idle reset.');
   dom.window.close();
 }
 main().catch(e=>{console.error(e);dom.window.close();process.exitCode=1;});

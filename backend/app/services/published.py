@@ -66,7 +66,7 @@ def prices(crop, market=None, today=None, db=None):
                                   else "estimated wholesale from retail",
                   "grade_prices": grade_prices(r["market_price"]),
                   "grade_policy": POLICY_VERSION,
-                  "forecast_is_past": r["forecast_month"] < now.strftime("%Y-%m"),
+                  "forecast_is_past": bool(r.get("forecast_month") and r["forecast_month"] < now.strftime("%Y-%m")),
                   "grade_notice": "Indicative adjustments: A +4%, B base, C -5.5%. Not official UNBS price rules."})
         output.append(r)
     output.sort(key=lambda r: (not r["core_area"], -int(r["last_month"].replace("-", "")), r["market"]))

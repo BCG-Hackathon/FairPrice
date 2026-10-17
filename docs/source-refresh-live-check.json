@@ -1,0 +1,21 @@
+{
+  "status": "published",
+  "source": "WFP/HDX Uganda",
+  "checked_at": "2026-10-17T02:47:21.204599+00:00",
+  "prices_generated_by_ai": false,
+  "monthly_observations": 5934,
+  "excluded_unit_or_flag_rows": 0,
+  "latest_month": "2026-08",
+  "sha256": "7132ff59be72fa472d691339e2fea56e1392b0dd27487b406e0a85e368f3ded7",
+  "source_url": "https://data.humdata.org/dataset/883929b1-521e-4834-97f5-0ccc2df75b89/resource/e082d683-cad5-4dcd-bf54-db76ae254d33/download/wfp_food_prices_uga.csv",
+  "records": 82,
+  "bytes": 4327511,
+  "auditor": {
+    "model": "IsolationForest",
+    "trees": 32,
+    "training_changes": 5585,
+    "training_sha256": "eb42ec344c976e796a34d4203864eda2e11311bdadbd199becfcfa0b858ef5aa",
+    "role": "flags changes for review; never generates prices"
+  },
+  "newer_series": 0
+}

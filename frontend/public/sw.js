@@ -1,6 +1,7 @@
-const CACHE = 'fairprice-original-v4-farmer-flow';
+const CACHE = 'fairprice-original-v6-buyers-grades';
 const SHELL = ['/', '/static/style.css', '/static/flow.js'];
 const PHOTOS = ['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/${c}.png`);
+PHOTOS.push(...['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/grades/${c}.png`));
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fairprice-original-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 // Install the small shell first. Photos are cached as used, not all downloaded on setup.

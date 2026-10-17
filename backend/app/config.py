@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
+from pydantic import Field
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -25,6 +26,9 @@ class Settings(BaseSettings):
 
     admin_token: str = "change-me"
     cors_origins: list[str] = ["*"]
+    source_refresh_enabled: bool = False
+    source_refresh_seconds: int = Field(default=86400, ge=300, le=604800)
+    buyer_registration_daily_limit: int = Field(default=100, ge=1, le=1000)
 
     # Defaults for channels
     default_language: str = "en"

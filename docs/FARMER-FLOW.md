@@ -2,6 +2,8 @@
 
 Implemented 17 October 2026. This supersedes earlier descriptions of SMS and training buttons in the main header.
 
+The later [buyer/grade/automation revision](BUYERS-GRADES-AUTOMATION.md) takes priority over this document's collapsed-grade cards and farmer SMS-action descriptions. Grades are visible with distinct illustrative images; each card now opens an exact crop/grade buyer directory. Buyer registration is newly authorised; farmer registration remains unnecessary.
+
 ## Farmer journey
 
 Language → crop category → crop → market → dated reference price.

@@ -272,3 +272,27 @@ class SmsOutbox(Base):
     provider: Mapped[str] = mapped_column(String(32))
     provider_ref: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class BuyerListing(Base):
+    """Opt-in buyer directory; no offer prices, farmer registry or transactions."""
+    __tablename__ = "buyer_listings"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(Unicode(80))
+    location: Mapped[str] = mapped_column(Unicode(100))
+    crop: Mapped[str] = mapped_column(String(32), index=True)
+    grade: Mapped[str] = mapped_column(String(1), index=True)
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    registration_key: Mapped[str] = mapped_column(String(64), index=True)
+
+
+class SourceRefreshRun(Base):
+    __tablename__ = "source_refresh_runs"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    status: Mapped[str] = mapped_column(String(32))
+    details: Mapped[dict] = mapped_column(JSON)

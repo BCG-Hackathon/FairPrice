@@ -14,10 +14,14 @@ def market_code(name):
     return re.sub(r"[^A-Z0-9]+", "_", name.upper()).strip("_")[:32]
 
 
-def seed_published(db, settings):
+def seed_published(db, settings, snapshot=None, commit=True):
     if db.scalar(select(PriceObservation.id).where(PriceObservation.source == "seed").limit(1)):
         raise ValueError("Published mode requires a separate database without synthetic seed observations.")
-    snapshot = load_snapshot()
+    if snapshot is None:
+        snapshot = load_snapshot()
+        existing = db.scalar(select(PublishedPrice).limit(1))
+        if existing and (existing.payload.get("snapshot_data_end", ""), existing.payload.get("snapshot_generated_at", "")) > (snapshot["data_end"], snapshot["generated_at"]):
+            return  # A restart must not replace newer published data with bundled artifacts.
     # Keep full provenance in the new public-record table; source branches remain intact.
     chosen = {}
     for r in snapshot["rows"]:
@@ -56,6 +60,8 @@ def seed_published(db, settings):
         else:
             existing.price_ugx_per_kg = r["market_price"]
             existing.source_price = r["observed_price"]
+        if not r.get("forecast_month") or r.get("market_price_forecast") is None:
+            continue
         forecast_day = date.fromisoformat(r["forecast_month"] + "-01")
         fc = db.scalar(select(PriceForecast).where(PriceForecast.crop_id == crop.id,
             PriceForecast.market_id == market.id, PriceForecast.period_start == forecast_day,
@@ -66,5 +72,5 @@ def seed_published(db, settings):
                                 model_version="team-2026-10-16"))
         else:
             fc.predicted_ugx_per_kg = r["market_price_forecast"] * 1.04
-    db.commit()
-    refresh_snapshots(db, settings)
+    db.flush()
+    refresh_snapshots(db, settings, commit=commit)
