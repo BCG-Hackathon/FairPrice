@@ -1,0 +1,114 @@
+{
+  "processed_sha256": "eb42ec344c976e796a34d4203864eda2e11311bdadbd199becfcfa0b858ef5aa",
+  "model_sha256": "568d029c9b22d9046ba12f5d13a6c2126b6cd61513becd16fb3306e7d73fe9bd",
+  "observations": 5925,
+  "labelled_pairs": 5585,
+  "train_pairs": 4959,
+  "test_pairs": 626,
+  "test_origin_from": "2025-08-01",
+  "model_metadata": {
+    "trained_at": "2026-10-16T20:39:19+00:00",
+    "data_end": "2026-08",
+    "target": "log price change, 1 month",
+    "use_model_for": [
+      "beans",
+      "cassava_fresh",
+      "leafy_vegetables",
+      "maize",
+      "millet",
+      "sorghum"
+    ]
+  },
+  "holdout_overall_matches_saved": true,
+  "holdout_by_crop_matches_saved": true,
+  "saved_model_forecasts_match_snapshot": true,
+  "reproduced_metrics": {
+    "overall": {
+      "rows": 626,
+      "model": {
+        "mape_pct": 16.71,
+        "within_10pct": 47.1
+      },
+      "naive": {
+        "mape_pct": 18.53,
+        "within_10pct": 48.7
+      },
+      "model_beats_naive": true
+    },
+    "by_crop": {
+      "beans": {
+        "rows": 144,
+        "model": {
+          "mape_pct": 8.73,
+          "within_10pct": 66.7
+        },
+        "naive": {
+          "mape_pct": 9.05,
+          "within_10pct": 68.8
+        },
+        "model_beats_naive": true
+      },
+      "cassava_fresh": {
+        "rows": 82,
+        "model": {
+          "mape_pct": 28.12,
+          "within_10pct": 22.0
+        },
+        "naive": {
+          "mape_pct": 32.36,
+          "within_10pct": 29.3
+        },
+        "model_beats_naive": true
+      },
+      "leafy_vegetables": {
+        "rows": 82,
+        "model": {
+          "mape_pct": 30.77,
+          "within_10pct": 24.4
+        },
+        "naive": {
+          "mape_pct": 36.07,
+          "within_10pct": 25.6
+        },
+        "model_beats_naive": true
+      },
+      "maize": {
+        "rows": 144,
+        "model": {
+          "mape_pct": 14.24,
+          "within_10pct": 50.0
+        },
+        "naive": {
+          "mape_pct": 15.31,
+          "within_10pct": 48.6
+        },
+        "model_beats_naive": true
+      },
+      "millet": {
+        "rows": 32,
+        "model": {
+          "mape_pct": 9.68,
+          "within_10pct": 59.4
+        },
+        "naive": {
+          "mape_pct": 10.09,
+          "within_10pct": 68.8
+        },
+        "model_beats_naive": true
+      },
+      "sorghum": {
+        "rows": 142,
+        "model": {
+          "mape_pct": 14.19,
+          "within_10pct": 49.3
+        },
+        "naive": {
+          "mape_pct": 15.18,
+          "within_10pct": 48.6
+        },
+        "model_beats_naive": true
+      }
+    }
+  },
+  "limitation": "Reproduces processed-data results only; original raw CSV and centred outlier filtering remain unaudited."
+}
