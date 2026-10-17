@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
-from pydantic import Field
+from pydantic import Field, SecretStr
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     source_refresh_enabled: bool = False
     source_refresh_seconds: int = Field(default=86400, ge=300, le=604800)
     buyer_registration_daily_limit: int = Field(default=100, ge=1, le=1000)
+
+    # SMS price updates via BulkSMS (bulksms.com > Settings > API Tokens). Empty = dry run only.
+    bulksms_token_id: str = ""
+    bulksms_token_secret: SecretStr = SecretStr("")
+    bulksms_api_base: str = "https://api.bulksms.com/v1"
+    bulksms_max_parts: int = 2  # each SMS part costs credits; update texts fit 2 parts
+    # Comma-separated E.164 numbers. When set, SMS only goes to these numbers (testing).
+    comms_allowed_recipients: str = ""
 
     # Defaults for channels
     default_language: str = "en"
