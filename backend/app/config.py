@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     bulksms_token_id: str = ""
     bulksms_token_secret: SecretStr = SecretStr("")
     bulksms_api_base: str = "https://api.bulksms.com/v1"
-    bulksms_max_parts: int = 2  # each SMS part costs credits; update texts fit 2 parts
+    bulksms_max_parts: int = 3  # each SMS part costs credits; farmer list fits 3, buyer texts 2
     # Comma-separated E.164 numbers. When set, SMS only goes to these numbers (testing).
     comms_allowed_recipients: str = ""
 
