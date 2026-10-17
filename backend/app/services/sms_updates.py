@@ -8,7 +8,7 @@
 
 Prices are never generated here: they come from published.prices() (WFP/HDX records and the
 saved model forecasts). Text is plain GSM-7; buyer texts stay within 2 SMS parts (306
-characters), the farmer list within 3 (459) so every crop gets its own line.
+characters), the farmer list within 4 (612) so every crop and price is spelled out.
 """
 
 from datetime import date
@@ -18,7 +18,7 @@ from app.services.grade_policy import grade_prices
 from app.services.published import CROP_META, prices
 
 SMS_MAX_CHARS = 306
-SMS_FARMER_MAX_CHARS = 459
+SMS_FARMER_MAX_CHARS = 612
 STEADY_BAND = 0.02  # model change within +/-2% reads as "steady"
 MONTHS = {
     "en": ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
@@ -30,10 +30,11 @@ CATEGORY_LABEL = {
 }
 TEXT = {
     "en": {
-        "farmer_title": "FairPrice market prices (UGX per kg)\nA=best B=good C=lower quality",
+        "farmer_title": ("FairPrice market prices\nPrice for 1 kg in Uganda shillings (UGX)\n"
+                         "Grade A = best, B = good, C = lower quality"),
         "none": "No prices yet",
         "trend": {"up": "rising", "down": "falling", "steady": "steady"},
-        "farmer_footer": "Prices of {month}. Guide only, not an offer.",
+        "farmer_footer": "Market prices from {month}. Guide only, not an offer.",
         "buyer_title": "FairPrice for {name}: {crop} grade {grade}, UGX/kg",
         "traded": "Recently traded: {places}",
         "buyer_model": "Model trend {month}: {pct}",
@@ -41,10 +42,11 @@ TEXT = {
         "stale_note": "* older than 6 months. ",
     },
     "sw": {
-        "farmer_title": "FairPrice bei za soko (UGX kwa kilo)\nA=bora B=nzuri C=ubora wa chini",
+        "farmer_title": ("FairPrice bei za soko\nBei ya kilo 1 kwa shilingi za Uganda (UGX)\n"
+                         "Daraja A = bora, B = nzuri, C = ubora wa chini"),
         "none": "Bado hakuna bei",
         "trend": {"up": "inapanda", "down": "inashuka", "steady": "imetulia"},
-        "farmer_footer": "Bei za {month}. Mwongozo tu, si ofa.",
+        "farmer_footer": "Bei za soko za {month}. Mwongozo tu, si ofa.",
         "buyer_title": "FairPrice kwa {name}: {crop} daraja {grade}, UGX/kg",
         "traded": "Inauzwa hivi karibuni: {places}",
         "buyer_model": "Mwenendo wa modeli {month}: {pct}",
@@ -116,20 +118,21 @@ def farmer_update(db, categories: list[str], language: str = "en", today: date |
     for section in sections:
         label = CATEGORY_LABEL[language][section["category"]]
         if not section["items"]:
-            lines.append(f"{label}: {text['none']}")
+            lines.append(f"\n{label}: {text['none']}")
             continue
-        lines.append(label)
+        lines.append(f"\n{label}")
         for item in section["items"]:
             name = CROP_META[item["crop"]][1 if language == "sw" else 0]
             grades = item["grades"]
-            line = f"{name}: A {_ugx(grades['A'])} B {_ugx(grades['B'])} C {_ugx(grades['C'])}"
+            line = ", ".join(f"{grade} UGX {_ugx(grades[grade])}" for grade in "ABC")
+            line = f"{name}: {line}"
             if item["model"]:
                 change = item["model"]["change"]
                 direction = "steady" if abs(change) < STEADY_BAND else "up" if change > 0 else "down"
-                line += f", {text['trend'][direction]}"
+                line += f" ({text['trend'][direction]})"
             lines.append(line)
     recorded = max((i["recorded"] for s in sections for i in s["items"]), default=None)
-    footer = text["farmer_footer"].format(month=_month(recorded, language))
+    footer = "\n" + text["farmer_footer"].format(month=_month(recorded, language))
     return {"sections": sections, "recorded": recorded, "sms": _fit(lines, footer, SMS_FARMER_MAX_CHARS)}
 
 
