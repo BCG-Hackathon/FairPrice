@@ -18,6 +18,237 @@ const GRADE_CAPTIONS={
   cassava_fresh:[['Fresh-looking, intact roots','Mizizi inayoonekana mibichi, haijaharibika'],['Minor skin marks; drier cut ends','Alama ndogo kwenye ngozi; ncha kavu zaidi'],['More shrivelling and dry cut ends','Mizizi iliyosinyaa na ncha kavu zaidi']],
   leafy_vegetables:[['Crisp, green leaves','Majani mabichi ya kijani'],['Some wilting and yellow edges','Baadhi yamenyauka na kuwa ya njano pembeni'],['More wilting and yellowing','Kunyauka na rangi ya njano zaidi']]
 };
+// Illustrative visual cues, not certified grading thresholds.
+const GRADE_POINTS={
+  "beans": [
+    [
+      [
+        "Whole, unbroken beans",
+        "Similar size and colour",
+        "Few shrivelled beans"
+      ],
+      [
+        "Maharagwe mazima, hayajavunjika",
+        "Ukubwa na rangi zinazofanana",
+        "Machache yamesinyaa"
+      ]
+    ],
+    [
+      [
+        "Some split or broken beans",
+        "Sizes are less even",
+        "Some beans are shrivelled"
+      ],
+      [
+        "Baadhi yamepasuka au kuvunjika",
+        "Ukubwa hautoshi kufanana",
+        "Baadhi ya maharagwe yamesinyaa"
+      ]
+    ],
+    [
+      [
+        "Many split or broken beans",
+        "More small, shrivelled beans",
+        "Large differences in size"
+      ],
+      [
+        "Mengi yamepasuka au kuvunjika",
+        "Mengi zaidi ni madogo na yamesinyaa",
+        "Tofauti kubwa za ukubwa"
+      ]
+    ]
+  ],
+  "maize": [
+    [
+      [
+        "Whole, intact kernels",
+        "Similar kernel size",
+        "Few broken pieces"
+      ],
+      [
+        "Punje nzima, hazijavunjika",
+        "Ukubwa wa punje unafanana",
+        "Vipande vichache vilivyovunjika"
+      ]
+    ],
+    [
+      [
+        "Some broken kernels",
+        "Uneven kernel sizes",
+        "Some shrivelled kernels"
+      ],
+      [
+        "Baadhi ya punje zimevunjika",
+        "Ukubwa wa punje haufanani",
+        "Baadhi ya punje zimesinyaa"
+      ]
+    ],
+    [
+      [
+        "Many broken kernels",
+        "More small, shrivelled kernels",
+        "Many loose kernel pieces"
+      ],
+      [
+        "Punje nyingi zimevunjika",
+        "Punje nyingi zaidi ni ndogo na zimesinyaa",
+        "Vipande vingi vya punje"
+      ]
+    ]
+  ],
+  "sorghum": [
+    [
+      [
+        "Mostly whole grains",
+        "Similar grain size",
+        "Few shrivelled grains"
+      ],
+      [
+        "Nafaka nyingi ni nzima",
+        "Ukubwa wa nafaka unafanana",
+        "Nafaka chache zimesinyaa"
+      ]
+    ],
+    [
+      [
+        "Some broken grains",
+        "Uneven grain sizes",
+        "Some shrivelled grains"
+      ],
+      [
+        "Baadhi ya nafaka zimevunjika",
+        "Ukubwa wa nafaka haufanani",
+        "Baadhi ya nafaka zimesinyaa"
+      ]
+    ],
+    [
+      [
+        "Many broken grains",
+        "More shrivelled grains",
+        "More small grain fragments"
+      ],
+      [
+        "Nafaka nyingi zimevunjika",
+        "Nafaka nyingi zaidi zimesinyaa",
+        "Vipande vidogo vingi vya nafaka"
+      ]
+    ]
+  ],
+  "millet": [
+    [
+      [
+        "Mostly whole grains",
+        "Similar size and colour",
+        "Few broken pieces"
+      ],
+      [
+        "Nafaka nyingi ni nzima",
+        "Ukubwa na rangi zinazofanana",
+        "Vipande vichache vilivyovunjika"
+      ]
+    ],
+    [
+      [
+        "Some broken grains",
+        "Less even grain sizes",
+        "Some shrivelled grains"
+      ],
+      [
+        "Baadhi ya nafaka zimevunjika",
+        "Ukubwa wa nafaka haufanani sana",
+        "Baadhi ya nafaka zimesinyaa"
+      ]
+    ],
+    [
+      [
+        "Many broken grains",
+        "More small, shrivelled grains",
+        "Many loose grain pieces"
+      ],
+      [
+        "Nafaka nyingi zimevunjika",
+        "Nafaka nyingi zaidi ni ndogo na zimesinyaa",
+        "Vipande vingi vya nafaka"
+      ]
+    ]
+  ],
+  "cassava_fresh": [
+    [
+      [
+        "Whole roots with little damage",
+        "Skin looks smooth and firm",
+        "Cut ends look fresh"
+      ],
+      [
+        "Mizizi mizima yenye uharibifu mdogo",
+        "Ngozi inaonekana laini na imara",
+        "Ncha zilizokatwa zinaonekana mbichi"
+      ]
+    ],
+    [
+      [
+        "Small scratches on the skin",
+        "Cut ends look slightly dry",
+        "Some roots look less firm"
+      ],
+      [
+        "Michubuko midogo kwenye ngozi",
+        "Ncha zilizokatwa zinaonekana kavu kidogo",
+        "Baadhi ya mizizi haionekani imara sana"
+      ]
+    ],
+    [
+      [
+        "More wrinkling on the skin",
+        "Cut ends look dry",
+        "More roots look shrivelled"
+      ],
+      [
+        "Mikunjo mingi zaidi kwenye ngozi",
+        "Ncha zilizokatwa zinaonekana kavu",
+        "Mizizi mingi zaidi inaonekana imesinyaa"
+      ]
+    ]
+  ],
+  "leafy_vegetables": [
+    [
+      [
+        "Leaves look crisp and upright",
+        "Mostly green leaves",
+        "Little visible wilting"
+      ],
+      [
+        "Majani yanaonekana imara na yamesimama",
+        "Majani mengi ni ya kijani",
+        "Kunyauka kidogo kunakoonekana"
+      ]
+    ],
+    [
+      [
+        "Some leaves are drooping",
+        "Some yellow leaf edges",
+        "Leaves look less crisp"
+      ],
+      [
+        "Baadhi ya majani yamelegea",
+        "Kingo za baadhi ya majani ni za njano",
+        "Majani hayaonekani imara sana"
+      ]
+    ],
+    [
+      [
+        "Many leaves are wilted",
+        "More yellow leaves and edges",
+        "Leaves look limp and curled"
+      ],
+      [
+        "Majani mengi yamenyauka",
+        "Majani na kingo nyingi zaidi ni za njano",
+        "Majani yanaonekana yamelegea na kujikunja"
+      ]
+    ]
+  ]
+};
 const image=c=>`<img src="${esc(c.image)}" alt="${esc(cropName(c))}" loading="lazy" decoding="async">`;
 const month=m=>{const [y,n]=m.split('-').map(Number);return new Intl.DateTimeFormat(state.lang==='sw'?'sw':'en-GB',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(y,n-1,1)));};
 function setConnection(message){$('#connection').textContent=message;}
@@ -34,7 +265,8 @@ async function api(path){
 }
 function closeModal(){if($('#modal').open)$('#modal').close();$('#modal-content').replaceChildren();}
 function showModal(html){closeModal();$('#modal-content').innerHTML=html;$('#modal').showModal();$('#modal').scrollTop=0;}
-function go(screen){navigationVersion++;state.screen=screen;render();window.scrollTo?.(0,0);}
+function go(screen){navigationVersion++;state.screen=screen;render();focusScreen();window.scrollTo?.(0,0);}
+function focusScreen(){const title=$('#app h1');if(title){title.tabIndex=-1;title.focus({preventScroll:true});}}
 function resetSession(){navigationVersion++;closeModal();if('speechSynthesis'in window)speechSynthesis.cancel();Object.assign(state,{lang:setup.language,screen:'welcome',category:null,crop:null,market:null,prices:null});lastActivity=Date.now();$('#idle-notice').hidden=true;render();window.scrollTo?.(0,0);}
 function touch(){lastActivity=Date.now();$('#idle-notice').hidden=true;}
 ['pointerdown','click','keydown','input','change'].forEach(type=>document.addEventListener(type,touch,{passive:true}));
@@ -51,45 +283,32 @@ function render(){
   $('#staff-open').textContent=text('Kiosk staff','Wahudumu wa kioski');
   $('#buyer-register').textContent=text('Register as buyer','Jisajili kama mnunuzi');
   $('#footer-copy').textContent=text('Farmers: no account needed · Dated reference prices','Wakulima: hamhitaji akaunti · Bei za kumbukumbu');
+  $('#app').dataset.screen=state.screen;
   if(!state.catalog)return;
   if(state.screen==='welcome'){
-    $('#app').innerHTML=`<div class="intro"><h1>${text('Know your crop’s value.','Fahamu thamani ya mazao yako.')}</h1><p>${text('Check a market price before you sell. No account or phone needed.','Angalia bei ya soko kabla ya kuuza. Huhitaji akaunti au simu.')}</p><h2>${text('Choose your language','Chagua lugha')}</h2><div class="big-actions"><button class="primary" data-lang="en">English</button><button data-lang="sw">Kiswahili</button></div><p class="muted">${esc(setup.name)}</p></div>`;
+    $('#app').innerHTML=`<h1 class="sr-only">${text('Choose your language','Chagua lugha')}</h1><div class="language-choices"><button class="image-choice" data-lang="en"><img src="/assets/design/english.png" alt="United Kingdom flag"><span>ENGLISH</span></button><button class="image-choice" data-lang="sw"><img src="/assets/design/swahili.png" alt="Uganda flag"><span>SWAHILI</span></button></div><p class="welcome-note">${text('Check a market price before you sell. No account or phone needed.','Angalia bei ya soko kabla ya kuuza. Huhitaji akaunti au simu.')}<br><small>${esc(setup.name)}</small></p>`;
   }else if(state.screen==='categories'){
-    $('#app').innerHTML=`<button class="back" data-back="welcome">← ${text('Language','Lugha')}</button><div class="intro"><h1>${text('What do you grow?','Unalima nini?')}</h1><p>${text('Choose your crop category.','Chagua aina ya mazao.')}</p></div><div class="big-actions"><button class="category" data-category="grains"><img src="/assets/maize.png" alt="">${text('Grains & beans','Nafaka na maharagwe')}</button><button class="category" data-category="vegetables"><img src="/assets/cassava_fresh.png" alt="">${text('Vegetables & roots','Mboga na mizizi')}</button></div>`;
+    $('#app').innerHTML=`<h1 class="page-title">${text('SELECT A CATEGORY BELOW','CHAGUA KILASIO CHINI')}</h1><div class="category-choices"><button class="category image-choice" data-category="grains"><img src="/assets/beans.png" alt="">${text('GRAINS & BEANS','NAFAKA NA MAHARAGWE')}</button><button class="category image-choice" data-category="vegetables"><img src="/assets/leafy_vegetables.png" alt="">${text('VEGETABLES & ROOTS','MBOGA NA MIZIZI')}</button></div><button class="back screen-back" data-back="welcome">← ${text('Language','Lugha')}</button>`;
   }else if(state.screen==='list'){
-    $('#app').innerHTML=`<button class="back" data-back="categories">← ${text('Categories','Aina za mazao')}</button><div class="list-head"><h1>${state.category==='grains'?text('Grains & beans','Nafaka na maharagwe'):text('Vegetables & roots','Mboga na mizizi')}</h1><input id="search" type="search" aria-label="${text('Search crops','Tafuta mazao')}" placeholder="${text('Search crops…','Tafuta mazao…')}"></div><div id="crop-list" class="crop-list"></div>`;renderList('');$('#search').oninput=e=>renderList(e.target.value);
-  }else if(state.screen==='market')renderMarket();
-  else if(state.screen==='detail')renderDetail();
+    $('#app').innerHTML=`<div class="list-head"><h1 class="page-title">${state.category==='grains'?text('AVAILABLE GRAINS & BEANS','NAFAKA NA MAHARAGWE YALIYOPO'):text('AVAILABLE VEGETABLES & ROOTS','MBOGA NA MIZIZI ILIYOPO')}</h1><div class="search-field"><label class="sr-only" for="search">${text('Search crops','Tafuta mazao')}</label><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="13" cy="13" r="9"/><path d="m20 20 9 9"/></svg><input id="search" type="search" aria-label="${text('Search crops','Tafuta mazao')}" placeholder="${text('Search crops…','Tafuta mazao…')}"></div></div><div id="crop-list" class="crop-list"></div><button class="back screen-back" data-back="categories">← ${text('Categories','Aina za mazao')}</button>`;renderList('');$('#search').oninput=e=>renderList(e.target.value);
+  }else if(state.screen==='detail')renderDetail();
   else if(state.screen==='staff')renderStaff();
 }
-function renderList(query){const list=state.catalog.crops.filter(c=>c.category===state.category&&`${c.name} ${c.name_sw}`.toLowerCase().includes(query.toLowerCase()));$('#crop-list').innerHTML=list.map(c=>`<button class="crop-row" data-crop="${c.id}">${image(c)}<span><strong>${esc(cropName(c))}</strong><small>${esc(c.form)}</small></span><span class="arrow" aria-hidden="true">›</span></button>`).join('')||`<p class="empty">${text('No matching crop with available data.','Hakuna zao lenye taarifa linalolingana.')}</p>`;}
-async function openCrop(id,market=null,refresh=false){
+function renderList(query){const list=state.catalog.crops.filter(c=>c.category===state.category&&`${c.name} ${c.name_sw}`.toLowerCase().includes(query.toLowerCase()));$('#crop-list').innerHTML=list.map(c=>`<button class="crop-row" data-crop="${c.id}"><span><strong>${esc(cropName(c))}</strong><small>${esc(c.form)}</small></span></button>`).join('')||`<p class="empty">${text('No matching crop with available data.','Hakuna zao lenye taarifa linalolingana.')}</p>`;}
+
+async function openCrop(id,market=null){
   const version=++navigationVersion;
   try{const data=await api('/api/prices/'+encodeURIComponent(id));if(version!==navigationVersion)return;if(!data.rows?.length)throw Error();
-    state.prices=data;state.crop=id;state.market=[market,setup.market].find(m=>data.rows.some(r=>r.market===m))||data.rows[0].market;state.screen=refresh?'detail':'market';render();window.scrollTo?.(0,0);
+    state.prices=data;state.crop=id;state.market=[market,setup.market].find(m=>data.rows.some(r=>r.market===m))||data.rows[0].market;state.screen='detail';render();focusScreen();window.scrollTo?.(0,0);
   }catch{if(version===navigationVersion)showModal(`<h2>${text('Price unavailable','Bei haipatikani')}</h2><p>${text('No published or saved price is available for this crop. Reconnect and try again, or choose another crop.','Hakuna bei iliyochapishwa au kuhifadhiwa kwa zao hili. Unganisha tena au chagua zao jingine.')}</p>`);}
-}
-function marketOptions(){return state.prices.rows.map(r=>`<option value="${esc(r.market)}" ${r.market===state.market?'selected':''}>${esc(r.market)} · ${r.last_month}</option>`).join('');}
-function renderMarket(){
-  const crop=state.catalog.crops.find(c=>c.id===state.crop);
-  $('#app').innerHTML=`<button class="back" data-back="list">← ${text('Crops','Mazao')}</button><div class="detail-top">${image(crop)}<div><h1>${text('Which market?','Soko gani?')}</h1><p>${esc(cropName(crop))} · UGX/kg</p></div></div><div class="market-step"><label for="market">${text('Choose a market','Chagua soko')}</label><select id="market">${marketOptions()}</select><p class="muted">${text('The date beside each market tells you when its price was recorded.','Tarehe iliyo karibu na soko inaonyesha mwezi ambao bei ilirekodiwa.')}</p><button class="primary" id="view-price">${text('See the price','Ona bei')}</button></div>`;
-  $('#market').onchange=e=>state.market=e.target.value;$('#view-price').onclick=()=>go('detail');
 }
 function current(){return state.prices?.rows.find(r=>r.market===state.market);}
 function renderDetail(){
-  const crop=state.catalog.crops.find(c=>c.id===state.crop),row=current();if(!row){go('market');return;}
-  const old=row.stale;
-  $('#app').innerHTML=`<button class="back" data-back="market">← ${text('Change market','Badilisha soko')}</button><div class="detail-top">${image(crop)}<div><h1>${esc(cropName(crop))}</h1><p>${esc(row.market)} · ${esc(crop.form)}</p></div></div>
-    <p class="record-date">${text('Recorded','Ilirekodiwa')}: <strong>${month(row.last_month)}</strong> · WFP / HDX</p>
-    ${old?`<div class="notice"><strong>${text('No recent price available for this market.','Hakuna bei ya hivi karibuni kwa soko hili.')}</strong> ${text('The older reference below is over six months old.','Bei ya kumbukumbu hapa chini ina zaidi ya miezi sita.')}</div>`:''}
-    <section class="base-price"><span>${old?text('Older market reference','Bei ya zamani ya kumbukumbu'):text('Market reference price','Bei ya kumbukumbu ya soko')}</span><strong>UGX ${money(row.market_price)} <small>/ kg</small></strong><p>${row.price_status==='observed wholesale'?text('Published wholesale price.','Bei ya jumla iliyochapishwa.'):text('Estimated wholesale price from a published shop price.','Makadirio ya bei ya jumla kutoka bei ya rejareja iliyochapishwa.')}</p></section>
-    <p class="price-caution">${text('A dated guide for negotiation—not a live buyer offer or a guaranteed selling price.','Mwongozo wa bei wenye tarehe, si ofa ya mnunuzi ya sasa au bei iliyohakikishwa.')}</p>
-    <section class="grade-details"><h2>${text('Grades and potential buyers','Madaraja na wanunuzi wanaoweza kununua')}</h2><p class="form-note">${text('Illustrative quality/freshness examples, not certified grades. Agree the actual quality with the buyer. Dry grain has quality differences, not ripeness stages.','Mifano ya ubora au ubichi, si madaraja yaliyothibitishwa. Kubaliana na mnunuzi kuhusu ubora halisi. Nafaka kavu hutofautiana kwa ubora, si ukomavu.')}</p><div class="grades">${['A','B','C'].map((g,i)=>`<section class="grade"><h2>${text('Grade','Daraja')} ${g}</h2><div class="grade-photo" role="img" aria-label="${esc(GRADE_CAPTIONS[crop.id][i][state.lang==='sw'?1:0])}" style="background-image:url('/assets/grades/${crop.id}.png');background-position:${i*50}% center"></div><p>${esc(GRADE_CAPTIONS[crop.id][i][state.lang==='sw'?1:0])}</p><div class="price">${money(row.grade_prices[g])}</div><div class="unit">UGX / kg · ${['+4%',text('base','msingi'),'−5.5%'][i]}</div><button class="primary" data-buyers-grade="${g}">${text('Potential buyers','Wanunuzi')}</button></section>`).join('')}</div><p class="form-note">${text('Price references above are not buyer offers. Buyer listings contain no prices; you negotiate directly.','Bei zilizo hapo juu si ofa za wanunuzi. Orodha za wanunuzi hazina bei; mnajadiliana moja kwa moja.')}</p></section>
-    <div class="detail-actions"><button class="primary" id="read-aloud">${text('Read aloud','Soma kwa sauti')}</button><button id="compare-open">${text('Compare markets','Linganisha masoko')}</button></div>
-    <details class="quality"><summary>${text('How do I check crop quality?','Ninaangaliaje ubora wa zao?')}</summary><p>${text('This app has not inspected your produce. A photo alone cannot establish an official grade. The A/B/C pricing labels have not been mapped to verified crop standards.','Programu hii haijakagua mazao yako. Picha pekee haiwezi kuthibitisha daraja rasmi. Lebo za bei A/B/C hazijaunganishwa na viwango vya mazao vilivyothibitishwa.')}</p>${crop.id==='beans'?`<p>${text('UNBS bean guidance considers foreign matter, damaged and broken beans, and measured moisture. Its grades 1/2/3 are separate from our A/B/C price adjustments.','Mwongozo wa UNBS wa maharagwe huangalia uchafu, maharagwe yaliyoharibika au kuvunjika na unyevu unaopimwa. Madaraja yake 1/2/3 ni tofauti na marekebisho yetu ya bei A/B/C.')}</p><a href="https://webstore.unbs.go.ug/standards/DRY_BEANS_-_BEST_PRACTICES_FOR_IMPROVED_NUTRITION_AND_INCOMES.pdf" target="_blank" rel="noreferrer">${text('UNBS dry-bean guidance','Mwongozo wa UNBS wa maharagwe makavu')}</a>`:`<p>${text('Verified guidance for this crop is not available in the app yet. Ask a trained local produce grader before treating a price adjustment as a quality grade.','Mwongozo uliothibitishwa wa zao hili haupo kwenye programu bado. Muulize mkaguzi wa mazao aliyefunzwa kabla ya kutumia marekebisho ya bei kama daraja la ubora.')}</p>`}</details>
-    <details class="calculation"><summary>${text('Where does this price come from?','Bei hii imetoka wapi?')}</summary><div class="source-strip">${text('Published observation','Bei iliyochapishwa')}: UGX ${money(row.observed_price)}/kg (${esc(row.observed_price_type)})<br>${text('Wholesale conversion','Ubadilishaji hadi bei ya jumla')}: × ${row.market_factor} · ${esc(row.market_factor_basis)}<br>${text('A +4%, B base, C −5.5% are application assumptions, not verified UNBS price rules.','A +4%, B bei ya msingi, C −5.5% ni dhana za programu, si kanuni za bei za UNBS zilizothibitishwa.')}<br><a href="https://data.humdata.org/dataset/wfp-food-prices-for-uganda" target="_blank" rel="noreferrer">WFP / HDX</a></div></details>
-    <button class="back" id="refresh">${text('Check for an updated record','Angalia taarifa mpya')}</button>`;
-  $('#read-aloud').onclick=()=>readPrice(crop,row);$('#compare-open').onclick=compareDialog;$('#refresh').onclick=()=>openCrop(state.crop,state.market,true);
+  const crop=state.catalog.crops.find(c=>c.id===state.crop),row=current();if(!row){go('list');return;}
+  $('#app').innerHTML=`<div class="detail-top"><h1>${esc(cropName(crop))}</h1></div>
+    <section class="grade-details" aria-label="${text('Produce grades','Madaraja ya mazao')}"><div class="grades">${['A','B','C'].map((g,i)=>`<section class="grade"><h2>${text('Grade','Daraja')} ${g}</h2><div class="grade-photo" role="img" aria-label="${esc(GRADE_CAPTIONS[crop.id][i][state.lang==='sw'?1:0])}" style="background-image:url('/assets/grades/${crop.id}.png');background-position:${i*50}% center"></div><ul class="grade-points">${GRADE_POINTS[crop.id][i][state.lang==='sw'?1:0].map(point=>`<li>${esc(point)}</li>`).join('')}</ul><span class="grade-price-label">${text('Price','Bei')}</span><div class="price"><span class="grade-currency">UGX </span>${money(row.grade_prices[g])}<span class="grade-per-kg">/kg</span></div><button class="primary" data-buyers-grade="${g}">${text('Get buyers','Pata wanunuzi')}</button></section>`).join('')}</div></section>
+    <p class="price-context">${esc(row.market)} · ${month(row.last_month)} · ${row.stale?text('Older reference price','Bei ya zamani ya kumbukumbu'):text('Indicative price','Bei ya makadirio')}</p>
+    <button class="back screen-back" data-back="list">← ${text('Crops','Mazao')}</button>`;
 }
 function smsUnavailable(){showModal(`<h2>${text('SMS is not available yet','SMS haipatikani bado')}</h2><p>${text('This kiosk cannot send a real text message yet. No phone number is needed or collected. You can read the price aloud or write down the crop, market, price and recorded month.','Kioski hiki hakiwezi kutuma ujumbe halisi bado. Hatuhitaji wala kukusanya nambari ya simu. Unaweza kusikiliza bei au kuandika zao, soko, bei na mwezi wa kumbukumbu.')}</p><p class="form-note">${text('The SMS test panel is available in the staff view.','Paneli ya majaribio ya SMS ipo kwenye sehemu ya wahudumu.')}</p>`);}
 function readPrice(crop,row){
@@ -104,9 +323,16 @@ function compareDialog(){
 }
 function renderStaff(){
   const markets=[...new Set(state.catalog.crops.flatMap(c=>c.markets))].sort();
-  $('#app').innerHTML=`<button class="back" data-back="welcome">← Farmer start screen</button><h1>Kiosk staff</h1><p>Settings apply only to this device. This public setup view contains no credentials or farmer records.</p><form id="setup-form" class="setup-form"><label for="kiosk-name">Kiosk name</label><input id="kiosk-name" maxlength="60" value="${esc(setup.name)}" required><label for="default-market">Default market</label><select id="default-market"><option value="">Latest available core-area market</option>${markets.map(m=>`<option ${m===setup.market?'selected':''}>${esc(m)}</option>`).join('')}</select><p class="form-note">If the chosen market has no record for a crop, the market step uses an available market and shows its date.</p><label for="default-language">Starting language</label><select id="default-language"><option value="en" ${setup.language==='en'?'selected':''}>English</option><option value="sw" ${setup.language==='sw'?'selected':''}>Kiswahili</option></select><label for="idle-minutes">Reset after inactivity</label><select id="idle-minutes">${[2,3,5].map(n=>`<option value="${n}" ${Number(setup.idleMinutes)===n?'selected':''}>${n} minutes</option>`).join('')}</select><button class="primary" type="submit">Save device setup</button><p id="setup-status" role="status"></p></form><h2>Service status</h2><p>Published source data through <strong>${esc(state.catalog.data_end)}</strong>. ${offlineRecord?'Using cached records.':'Records were retrieved from the local backend.'}</p><p>Live SMS: <strong>not connected</strong>. Quality-grade mapping: <strong>not validated</strong>.</p><div class="detail-actions"><button id="sms-open">SMS simulator (test only)</button><button id="training-open">Training and data details</button></div><p class="form-note">Device speech, local language wording and offline reload need acceptance checks on each kiosk tablet. No Acholi support is claimed.</p>`;
+  $('#app').innerHTML=`<button class="back" data-back="welcome">← Farmer start screen</button><h1>Kiosk staff</h1><p>Settings apply only to this device. This public setup view contains no credentials or farmer records.</p><form id="setup-form" class="setup-form"><label for="kiosk-name">Kiosk name</label><input id="kiosk-name" maxlength="60" value="${esc(setup.name)}" required><label for="default-market">Default market</label><select id="default-market"><option value="">Latest available core-area market</option>${markets.map(m=>`<option ${m===setup.market?'selected':''}>${esc(m)}</option>`).join('')}</select><p class="form-note">Farmers go straight from a crop to its grade prices. If the configured market has no record, an available market is used; its name and date appear below the cards.</p><label for="default-language">Starting language</label><select id="default-language"><option value="en" ${setup.language==='en'?'selected':''}>English</option><option value="sw" ${setup.language==='sw'?'selected':''}>Kiswahili</option></select><label for="idle-minutes">Reset after inactivity</label><select id="idle-minutes">${[2,3,5].map(n=>`<option value="${n}" ${Number(setup.idleMinutes)===n?'selected':''}>${n} minutes</option>`).join('')}</select><button class="primary" type="submit">Save device setup</button><p id="setup-status" role="status"></p></form><h2>Service status</h2><p>Published source data through <strong>${esc(state.catalog.data_end)}</strong>. ${offlineRecord?'Using cached records.':'Records were retrieved from the local backend.'}</p><p>Live SMS: <strong>not connected</strong>. Quality-grade mapping: <strong>not validated</strong>.</p><div class="detail-actions"><button id="sms-open">SMS simulator (test only)</button><button id="training-open">Training and data details</button></div><p class="form-note">Device speech, local language wording and offline reload need acceptance checks on each kiosk tablet. No Acholi support is claimed.</p>`;
   $('#setup-form').onsubmit=e=>{e.preventDefault();setup={name:$('#kiosk-name').value.trim()||DEFAULTS.name,market:$('#default-market').value,language:$('#default-language').value,idleMinutes:Number($('#idle-minutes').value)};try{localStorage.setItem('fairprice:setup',JSON.stringify(setup));$('#setup-status').textContent='Device setup saved.';}catch{$('#setup-status').textContent='Settings apply for this session; device storage is unavailable.';}};
   $('#sms-open').onclick=()=>smsDialog();$('#training-open').onclick=trainingDialog;
+  if(state.prices&&current()){
+    const crop=state.catalog.crops.find(c=>c.id===state.crop),row=current();
+    const reference=document.createElement('section');
+    reference.innerHTML=`<h2>Selected crop reference</h2><p>${esc(crop.name)} · ${esc(row.market)} · ${month(row.last_month)}${row.stale?' · Over six months old':''}</p><p>Market reference: UGX ${money(row.market_price)}/kg. Published observation: UGX ${money(row.observed_price)}/kg (${esc(row.observed_price_type)}). Wholesale conversion: × ${row.market_factor} (${esc(row.market_factor_basis)}).</p><p>A +4%, B base and C −5.5% are application assumptions, not certified grades or buyer offers. Grade photos are illustrative; agree actual quality with the buyer.</p><div class="detail-actions"><button id="read-aloud">Read aloud</button><button id="compare-open">Compare markets</button><button id="refresh">Check for an updated record</button></div>`;
+    $('#app').append(reference);
+    $('#read-aloud').onclick=()=>readPrice(crop,row);$('#compare-open').onclick=compareDialog;$('#refresh').onclick=()=>openCrop(state.crop,state.market);
+  }
   const tools=document.createElement('section');tools.innerHTML='<h2>Buyer review & source automation</h2><p>Registrations stay private until reviewed. Review is not proof of identity or ability to pay. Listings expire after 30 days.</p><label for="staff-key">Staff access key</label><input id="staff-key" type="password" autocomplete="off"><p class="form-note">Never saved on this device. Closing this staff session clears it. Configure ADMIN_TOKEN on the server; the default token is rejected.</p><div class="detail-actions"><button id="review-buyers">Review buyer registrations</button><button id="source-check">Check official source now</button><button id="source-status">Automation status</button></div><div id="staff-results" role="status"></div>';$('#app').append(tools);
   $('#review-buyers').onclick=reviewBuyers;$('#source-check').onclick=()=>sourceStatus(true);$('#source-status').onclick=()=>sourceStatus(false);
 }

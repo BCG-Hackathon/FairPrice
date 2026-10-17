@@ -1,5 +1,6 @@
-const CACHE = 'fairprice-original-v6-buyers-grades';
-const SHELL = ['/', '/static/style.css', '/static/flow.js'];
+const CACHE = 'fairprice-original-v9-grade-quality-points';
+const SHELL = ['/', '/static/style.css', '/static/design.css', '/static/flow.js'];
+SHELL.push(...['english.png','swahili.png','logo-white.png','logo-green.png'].map(n=>'/assets/design/'+n));
 const PHOTOS = ['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/${c}.png`);
 PHOTOS.push(...['beans','maize','sorghum','millet','cassava_fresh','leafy_vegetables'].map(c=>`/assets/grades/${c}.png`));
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
